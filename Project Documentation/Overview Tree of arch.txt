@@ -1,0 +1,16 @@
+[UI / Controllers]
+        │
+        ▼
+[Application Layer]
+   ├── Services (HotelService, RoomService, BookingService)
+   ├── DTOs
+   └── Interfaces (IUnitOfWork, IGenericRepository<T>, IHotelService ...)
+        │
+        ▼
+[Infrastructure Layer]
+   ├── DbContext
+   ├── GenericRepository<T>
+   └── UnitOfWork
+        │
+        ▼
+[Database / EF Core]

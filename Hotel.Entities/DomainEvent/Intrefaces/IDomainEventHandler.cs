@@ -1,0 +1,13 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Hotel.Entities.DomainEvent.Intrefaces
+{
+    public interface IDomainEventHandler<TEvent> where TEvent : IDomainEvent
+    {
+        Task Handle(TEvent domainEvent, CancellationToken cancellationToken);
+    }
+}

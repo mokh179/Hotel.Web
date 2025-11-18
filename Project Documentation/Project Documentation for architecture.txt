@@ -1,0 +1,102 @@
+# Hotel Booking System – Documentation
+
+## 1️⃣ Domain Layer
+**الوظيفة:** يحتوي على الـ Entities و Domain Events ويعرف قواعد العمل الأساسية للنظام.
+
+### Entities
+- **BaseEntity**
+  - Id: المفتاح الأساسي لكل كيان
+  - CreatedAt: وقت الإنشاء
+  - UpdatedAt: وقت آخر تعديل
+  - IsDeleted: لدعم Soft Delete
+  - DeletedAt: وقت الحذف الفعلي
+
+- **Hotel**
+  - Name: اسم الفندق
+  - Location: موقع الفندق
+  - StarRating: تقييم الفندق
+
+- **Room**
+  - HotelId: الربط بالفندق
+  - Name: اسم الغرفة
+  - RoomType: نوع الغرفة
+  - Price: سعر الغرفة
+
+- **Booking**
+  - RoomId: الغرفة المحجوزة
+  - UserId: المستخدم
+  - StartDate, EndDate: فترة الحجز
+  - TotalPrice: السعر الإجمالي
+  - Status: حالة الحجز (Pending, Confirmed, Cancelled)
+
+### Domain Events
+- مثال: BookingCreatedEvent
+- تستخدم لإطلاق أحداث عند تغييرات معينة داخل Domain (يمكن لاحقًا استخدامها في Notifications أو Integration Events)
+
+---
+
+## 2️⃣ Application Layer
+**الوظيفة:** يحتوي على Interfaces, DTOs, Services, Use Cases ويعتبر الوسيط بين UI و Infrastructure.
+
+### 2.1 DTOs
+- HotelDto, RoomDto, BookingDto
+- يحتوي على الحقول الأساسية + Id لتسهيل التحديثات
+- يحتوي على CreatedAt, UpdatedAt, IsDeleted, DeletedAt لدعم Soft Delete و Audit
+- Bulk Operations تعتمد على Id لتحديد السجلات
+
+### 2.2 Interfaces
+- **IGenericRepository<T>**
+  - CRUD: GetByIdAsync, GetAllAsync, AddAsync, Update, Delete
+  - Bulk: AddRangeAsync, ExecuteUpdateAsync, ExecuteDeleteAsync
+  - IQueryable<T> Entities → لتمكين LINQ و Bulk Operations
+
+- **IUnitOfWork**
+  - يحتوي على كل الـ Repositories: Hotels, Rooms, Bookings
+  - SaveChangesAsync()
+
+- **Service Interfaces**
+  - IHotelService, IRoomService, IBookingService
+  - كل Interface يحتوي على: CRUD + Bulk Operations
+
+### 2.3 Services Implementation
+- HotelService, RoomService, BookingService
+- تعتمد على IUnitOfWork + IMapper فقط
+- CRUD كامل + Bulk Operations
+- Soft Delete مطبق
+- AutoMapper لتحويل DTO ↔ Entity
+- Bulk Operations باستخدام ExecuteUpdateAsync و ExecuteDeleteAsync
+- Application Layer لا تعرف EF Core
+
+### 2.4 AutoMapper
+- MappingProfile لتحويل DTO ↔ Entity
+- يسهل نقل البيانات بين Layers بدون تكرار الكود
+
+---
+
+## 3️⃣ Clean Architecture & SOLID
+- Single Responsibility: كل Service مسؤول عن كيان واحد فقط
+- Open/Closed: إضافة Bulk أو خصائص جديدة بدون كسر الكود
+- Liskov Substitution: يمكن استبدال أي Interface بأي Implementation
+- Interface Segregation: كل Interface مختص بوظائفه
+- Dependency Inversion: Application Layer تعتمد على Interfaces فقط
+
+---
+
+## 4️⃣ Bulk Operations
+- AddRangeAsync → إضافة مجموعة كيانات دفعة واحدة
+- ExecuteUpdateAsync → تحديث مجموعة كيانات مباشرة في قاعدة البيانات بدون تحميلها في الذاكرة
+- ExecuteDeleteAsync → حذف مجموعة كيانات (Soft Delete)
+
+**فوائد Bulk Operations:**
+- أداء عالي لتحديث/حذف/إضافة بيانات كبيرة
+- يقلل عدد الاستدعاءات لقاعدة البيانات
+- يحافظ على Clean Architecture لأن Application Layer تستخدم Interfaces فقط
+
+---
+
+## 5️⃣ Summary
+1. Domain Layer: Entities + Domain Events
+2. Application Layer: DTOs + Interfaces + Services + AutoMapper + Bulk Operations
+3. Clean Code & SOLID: Modular, قابل للتوسع، وصديق للصيانة
+4. Bulk Ready: جميع Services تدعم Bulk Add, Update, Delete
+5. Soft Delete & Audit: دعم IsDeleted, DeletedAt, CreatedAt, UpdatedAt في كل الكيانات
