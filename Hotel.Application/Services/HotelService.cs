@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Hotel.Application.DTOs;
+using Hotel.Application.DTOs.HotelDto;
 using Hotel.Application.Interfaces;
+using Hotel.Application.Interfaces.Services;
 using Hotel.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,79 +23,61 @@ namespace Hotel.Application.Services
             _mapper = mapper;
         }
 
-        // Create
-        public async Task AddHotelAsync(HotelDTO hotelDto)
+        public async Task<HotelDTO> GetByIdAsync(Guid id)
         {
-            var hotel = _mapper.Map<Hotel.Entities.Entities.Hotel>(hotelDto);
-            await _unitOfWork.Hotels.AddAsync(hotel);
+            var entity = await _unitOfWork.Hotels.Query()
+                                .Include(h => h.City)
+                                .ThenInclude(c => c.Country)
+                                .FirstOrDefaultAsync(h => h.Id == id);
+            return _mapper.Map<HotelDTO>(entity);
+        }
+
+        public async Task<List<HotelDTO>> GetAllAsync()
+        {
+            var entities = await _unitOfWork.Hotels.Query()
+                                    .Include(h => h.City)
+                                    .ThenInclude(c => c.Country)
+                                    .ToListAsync();
+            return _mapper.Map<List<HotelDTO>>(entities);
+        }
+
+        public async Task<HotelDTO> CreateAsync(CreateHotelDTO dto)
+        {
+            var entity = _mapper.Map<Hotel.Entities.Entities.Hotel>(dto);
+            await _unitOfWork.Hotels.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<HotelDTO>(entity);
+        }
+
+        public async Task<HotelDTO> UpdateAsync(UpdateHotelDTO dto)
+        {
+            var entity = await _unitOfWork.Hotels.GetByIdAsync(dto.Id);
+            if (entity == null) throw new Exception("Hotel not found");
+
+            _mapper.Map(dto, entity);
+            _unitOfWork.Hotels.Update(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<HotelDTO>(entity);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            await _unitOfWork.Hotels.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Read All
-        public async Task<IEnumerable<HotelDTO>> GetAllHotelsAsync()
+        public async Task AddRangeAsync(IEnumerable<CreateHotelDTO> dtos)
         {
-            var hotels = await _unitOfWork.Hotels.GetAllAsync();
-            return _mapper.Map<IEnumerable<HotelDTO>>(hotels);
-        }
-
-        // Read by Id
-        public async Task<HotelDTO> GetHotelByIdAsync(int hotelId)
-        {
-            var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
-            return _mapper.Map<HotelDTO>(hotel);
-        }
-
-        // Update
-        public async Task UpdateHotelAsync(int hotelId, HotelDTO hotelDto)
-        {
-            var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
-            if (hotel == null) throw new Exception("Hotel not found");
-
-            _mapper.Map(hotelDto, hotel); // تحديث الحقول
-            _unitOfWork.Hotels.Update(hotel);
+            var entities = _mapper.Map<IEnumerable<Hotel.Entities.Entities.Hotel>>(dtos);
+            await _unitOfWork.Hotels.AddRangeAsync(entities);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Delete (Soft Delete)
-        public async Task DeleteHotelAsync(int hotelId)
+        public async Task SoftDeleteRangeAsync(IEnumerable<Guid> ids)
         {
-            var hotel = await _unitOfWork.Hotels.GetByIdAsync(hotelId);
-            if (hotel == null) throw new Exception("Hotel not found");
-
-            _unitOfWork.Hotels.Delete(hotel);
+            await _unitOfWork.Hotels.SoftDeleteRangeAsync(ids);
             await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task AddHotelsAsync(IEnumerable<HotelDTO> hotelDtos)
-        {
-            var hotels = _mapper.Map<IEnumerable<Hotel.Entities.Entities.Hotel>>(hotelDtos);
-            await _unitOfWork.Hotels.AddRangeAsync(hotels);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        // Bulk Update
-        public async Task UpdateHotelsAsync(IEnumerable<HotelDTO> hotelDtos)
-        {
-            foreach (var dto in hotelDtos)
-            {
-                await _unitOfWork.Hotels.Entities
-                    .Where(h => h.Id == dto.Id)
-                    .ExecuteUpdateAsync(h => h
-                        .SetProperty(p => p.Name, dto.Name)
-                        .SetProperty(p => p.Location, dto.Location)
-                    );
-            }
-        }
-
-        // Bulk Delete (Soft Delete)
-        public async Task DeleteHotelsAsync(IEnumerable<int> hotelIds)
-        {
-            await _unitOfWork.Hotels.Entities
-                .Where(h => hotelIds.Contains(h.Id))
-                .ExecuteUpdateAsync(h => h
-                    .SetProperty(p => p.IsDeleted, true)
-                    .SetProperty(p => p.DeletedAt, DateTime.UtcNow)
-                );
         }
     }
 }

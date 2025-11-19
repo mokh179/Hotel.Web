@@ -5,14 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel.Application.DTOs
+namespace Hotel.Application.DTOs.RoomDto
 {
-    public class RoomDTO
+    public class UpdateRoomDTO
     {
-        public int Id { get; set; }
-        public int HotelId { get; set; }
+        public Guid Id { get; set; }
         public string RoomNumber { get; set; }
         public decimal Price { get; set; }
         public RoomType RoomType { get; set; }
+
     }
 }

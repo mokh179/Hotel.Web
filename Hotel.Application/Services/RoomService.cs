@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Hotel.Application.DTOs;
+using Hotel.Application.DTOs.RoomDto;
 using Hotel.Application.Interfaces;
+using Hotel.Application.Interfaces.Services;
 using Hotel.Entities.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -22,79 +23,61 @@ namespace Hotel.Application.Services
             _mapper = mapper;
         }
 
-        // Create
-        public async Task AddRoomAsync(RoomDTO roomDto)
+        public async Task<RoomDTO> GetByIdAsync(Guid id)
         {
-            var room = _mapper.Map<Room>(roomDto);
-            await _unitOfWork.Rooms.AddAsync(room);
+            var entity = await _unitOfWork.Rooms.GetByIdAsync(id);
+            return _mapper.Map<RoomDTO>(entity);
+        }
+
+        public async Task<List<RoomDTO>> GetAllAsync()
+        {
+            var entities = await _unitOfWork.Rooms.GetAllAsync();
+            return _mapper.Map<List<RoomDTO>>(entities);
+        }
+
+        public async Task<RoomDTO> CreateAsync(CreateRoomDTO dto)
+        {
+            var entity = _mapper.Map<Room>(dto);
+            await _unitOfWork.Rooms.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<RoomDTO>(entity);
+        }
+
+        public async Task<RoomDTO> UpdateAsync(UpdateRoomDTO dto)
+        {
+            var entity = await _unitOfWork.Rooms.GetByIdAsync(dto.Id);
+            if (entity == null) throw new Exception("Room not found");
+
+            _mapper.Map(dto, entity);
+            _unitOfWork.Rooms.Update(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<RoomDTO>(entity);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            await _unitOfWork.Rooms.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Read All by Hotel
-        public async Task<IEnumerable<RoomDTO>> GetRoomsByHotelAsync(int hotelId)
+        public async Task<List<RoomDTO>> GetByHotelIdAsync(Guid hotelId)
         {
-            var rooms = await _unitOfWork.Rooms.GetAllAsync();
-            return _mapper.Map<IEnumerable<RoomDTO>>(rooms.Where(r => r.HotelId == hotelId));
+            var entities = await _unitOfWork.Rooms.FindAsync(r => r.HotelId == hotelId);
+            return _mapper.Map<List<RoomDTO>>(entities);
         }
 
-        // Read by Id
-        public async Task<RoomDTO> GetRoomByIdAsync(int roomId)
+        public async Task AddRangeAsync(IEnumerable<CreateRoomDTO> dtos)
         {
-            var room = await _unitOfWork.Rooms.GetByIdAsync(roomId);
-            return _mapper.Map<RoomDTO>(room);
-        }
-
-        // Update
-        public async Task UpdateRoomAsync(int roomId, RoomDTO roomDto)
-        {
-            var room = await _unitOfWork.Rooms.GetByIdAsync(roomId);
-            if (room == null) throw new Exception("Room not found");
-
-            _mapper.Map(roomDto, room);
-            _unitOfWork.Rooms.Update(room);
+            var entities = _mapper.Map<IEnumerable<Room>>(dtos);
+            await _unitOfWork.Rooms.AddRangeAsync(entities);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Delete (Soft Delete)
-        public async Task DeleteRoomAsync(int roomId)
+        public async Task SoftDeleteRangeAsync(IEnumerable<Guid> ids)
         {
-            var room = await _unitOfWork.Rooms.GetByIdAsync(roomId);
-            if (room == null) throw new Exception("Room not found");
-
-            _unitOfWork.Rooms.Delete(room);
+            await _unitOfWork.Rooms.SoftDeleteRangeAsync(ids);
             await _unitOfWork.SaveChangesAsync();
-        }
-
-        public async Task AddRoomsAsync(IEnumerable<RoomDTO> roomDtos)
-        {
-            var rooms = _mapper.Map<IEnumerable<Room>>(roomDtos);
-            await _unitOfWork.Rooms.AddRangeAsync(rooms);
-            await _unitOfWork.SaveChangesAsync();
-        }
-
-        // Bulk Update
-        public async Task UpdateRoomsAsync(IEnumerable<RoomDTO> roomDtos)
-        {
-            foreach (var dto in roomDtos)
-            {
-                await _unitOfWork.Rooms.Entities
-                    .Where(r => r.Id == dto.Id)
-                    .ExecuteUpdateAsync(r => r
-                        .SetProperty(p => p.RoomNumber, dto.RoomNumber)
-                        .SetProperty(p => p.Price, dto.Price)
-                    );
-            }
-        }
-
-        // Bulk Delete (Soft Delete)
-        public async Task DeleteRoomsAsync(IEnumerable<int> roomIds)
-        {
-            await _unitOfWork.Rooms.Entities
-                .Where(r => roomIds.Contains(r.Id))
-                .ExecuteUpdateAsync(r => r
-                    .SetProperty(p => p.IsDeleted, true)
-                    .SetProperty(p => p.DeletedAt, DateTime.UtcNow)
-                );
         }
     }
 

@@ -1,15 +1,36 @@
+using Hotel.Application.Interfaces.Services;
+using Hotel.Application.Interfaces;
+using Hotel.Application.Mapping;
+using Hotel.Application.Services;
+using Hotel.Infrastructure.Identity;
+using Hotel.Infrastructure.Persistence;
+using Hotel.Infrastructure.UnitOfWork;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Serilog;
+using System.Text;
+using Hotel.Infrastructure.DependencyInjection;
+using Hotel.Infrastructure.Seeders;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
-//builder.Services.AddAutoMapper(typeof(MappingProfile));
+using (var scope = app.Services.CreateScope())
+{
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-//builder.Services.AddScoped<IHotelService, HotelService>();
-//builder.Services.AddScoped<IRoomService, RoomService>();
-//builder.Services.AddScoped<IBookingService, BookingService>();
-//builder.Services.AddScoped<IDomainEventHandler<BookingCreatedEvent>, BookingCreatedEventHandler>();
+    await RolesSeeder.SeedRolesAsync(roleManager);
+}
+builder.Host.UseSerilog();
+builder.Services.AddInfrastructureServices(builder.Configuration);
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -22,6 +43,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

@@ -12,7 +12,8 @@ namespace Hotel.Application.Interfaces
         IGenericRepository<Hotel.Entities.Entities.Hotel> Hotels { get; }
         IGenericRepository<Room> Rooms { get; }
         IGenericRepository<Booking> Bookings { get; }
-
+         IGenericRepository<Country> Countries { get; }
+         IGenericRepository<City> Cities { get; }
         Task<int> SaveChangesAsync();
     }
 }

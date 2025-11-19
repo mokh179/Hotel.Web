@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel.Application.DTOs
+namespace Hotel.Application.DTOs.Locations.City
 {
-    public class HotelDTO
+    public class CreateCityDTO
     {
-        public int Id { get; set; }
         public string Name { get; set; }
-        public string Location { get; set; }
+        public Guid CountryId { get; set; }
     }
+
 }

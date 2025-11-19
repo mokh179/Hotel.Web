@@ -4,13 +4,20 @@ namespace Hotel.Entities.Entities
 {
     public abstract class BaseEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; private set; } = Guid.NewGuid();
+
+        public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+
+        public DateTime? UpdatedAt { get; private set; }
         public bool IsDeleted { get; set; } = false;
-        public DateTime? DeletedAt { get; set; }
 
         private List<IDomainEvent> _domainEvents;
         public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents?.AsReadOnly();
 
+        public void MarkUpdated()
+        {
+            UpdatedAt = DateTime.UtcNow;
+        }
         protected void AddDomainEvent(IDomainEvent eventItem)
         {
             _domainEvents ??= new List<IDomainEvent>();

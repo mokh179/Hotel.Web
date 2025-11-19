@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
-using Hotel.Application.DTOs;
+using Hotel.Application.DTOs.BookingDto;
 using Hotel.Application.Interfaces;
+using Hotel.Application.Interfaces.Services;
 using Hotel.Entities.Entities;
 using System;
 using System.Collections.Generic;
@@ -21,46 +22,60 @@ namespace Hotel.Application.Services
             _mapper = mapper;
         }
 
-        // Create
-        public async Task CreateBookingAsync(BookingDTO bookingDto)
+        public async Task<BookingDTO> GetByIdAsync(Guid id)
         {
-            var booking = _mapper.Map<Booking>(bookingDto);
-            await _unitOfWork.Bookings.AddAsync(booking);
+            var entity = await _unitOfWork.Bookings.GetByIdAsync(id);
+            return _mapper.Map<BookingDTO>(entity);
+        }
+
+        public async Task<List<BookingDTO>> GetAllAsync()
+        {
+            var entities = await _unitOfWork.Bookings.GetAllAsync();
+            return _mapper.Map<List<BookingDTO>>(entities);
+        }
+
+        public async Task<BookingDTO> CreateAsync(CreateBookingDTO dto)
+        {
+            var entity = _mapper.Map<Booking>(dto);
+            await _unitOfWork.Bookings.AddAsync(entity);
+            await _unitOfWork.SaveChangesAsync();
+            return _mapper.Map<BookingDTO>(entity);
+        }
+
+        public async Task<BookingDTO> UpdateAsync(UpdateBookingDTO dto)
+        {
+            var entity = await _unitOfWork.Bookings.GetByIdAsync(dto.Id);
+            if (entity == null) throw new Exception("Booking not found");
+
+            _mapper.Map(dto, entity);
+            _unitOfWork.Bookings.Update(entity);
+            await _unitOfWork.SaveChangesAsync();
+
+            return _mapper.Map<BookingDTO>(entity);
+        }
+
+        public async Task DeleteAsync(Guid id)
+        {
+            await _unitOfWork.Bookings.DeleteAsync(id);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Read All
-        public async Task<IEnumerable<BookingDTO>> GetAllBookingsAsync()
+        public async Task<List<BookingDTO>> GetByUserIdAsync(Guid userId)
         {
-            var bookings = await _unitOfWork.Bookings.GetAllAsync();
-            return _mapper.Map<IEnumerable<BookingDTO>>(bookings);
+            var entities = await _unitOfWork.Bookings.FindAsync(b => b.UserId == userId);
+            return _mapper.Map<List<BookingDTO>>(entities);
         }
 
-        // Read by Id
-        public async Task<BookingDTO> GetBookingByIdAsync(int bookingId)
+        public async Task AddRangeAsync(IEnumerable<CreateBookingDTO> dtos)
         {
-            var booking = await _unitOfWork.Bookings.GetByIdAsync(bookingId);
-            return _mapper.Map<BookingDTO>(booking);
-        }
-
-        // Update
-        public async Task UpdateBookingAsync(int bookingId, BookingDTO bookingDto)
-        {
-            var booking = await _unitOfWork.Bookings.GetByIdAsync(bookingId);
-            if (booking == null) throw new Exception("Booking not found");
-
-            _mapper.Map(bookingDto, booking);
-            _unitOfWork.Bookings.Update(booking);
+            var entities = _mapper.Map<IEnumerable<Booking>>(dtos);
+            await _unitOfWork.Bookings.AddRangeAsync(entities);
             await _unitOfWork.SaveChangesAsync();
         }
 
-        // Delete (Soft Delete)
-        public async Task DeleteBookingAsync(int bookingId)
+        public async Task SoftDeleteRangeAsync(IEnumerable<Guid> ids)
         {
-            var booking = await _unitOfWork.Bookings.GetByIdAsync(bookingId);
-            if (booking == null) throw new Exception("Booking not found");
-
-            _unitOfWork.Bookings.Delete(booking);
+            await _unitOfWork.Bookings.SoftDeleteRangeAsync(ids);
             await _unitOfWork.SaveChangesAsync();
         }
     }

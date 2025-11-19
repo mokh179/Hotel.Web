@@ -21,7 +21,7 @@ namespace Hotel.Entities.Entities
         public decimal Price { get; set; }
 
         [Required]
-        public int HotelId { get; set; }
+        public Guid HotelId { get; set; }
 
         public Hotel Hotel { get; set; }
 

@@ -12,13 +12,13 @@ namespace Hotel.Entities.Entities
     public class Booking : BaseEntity
     {
         [Required]
-        public int RoomId { get; set; }
+        public Guid RoomId { get; set; }
 
         [Required]
         public Room Room { get; set; }
 
         [Required]
-        public string UserId { get; set; }  // Identity User
+        public Guid UserId { get; set; }  // Identity User
 
         [Required]
         public DateTime CheckIn { get; set; }
@@ -27,7 +27,7 @@ namespace Hotel.Entities.Entities
         public DateTime CheckOut { get; set; }
 
         public DateRange DateRange => new DateRange(CheckIn, CheckOut);
-        public Booking(int roomId, string userId, DateTime checkIn, DateTime checkOut)
+        public Booking(Guid roomId, Guid userId, DateTime checkIn, DateTime checkOut)
         {
             RoomId = roomId;
             UserId = userId;
