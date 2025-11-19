@@ -16,36 +16,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Hotel.Infrastructure.Repositories;
 
 namespace Hotel.Infrastructure.DependencyInjection
 {
     public static class InfrastructureServiceRegistration
     {
-        public static void AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInfrastructureServices(
+            this IServiceCollection services,
+            IConfiguration configuration)
         {
-            //looging
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
-                .WriteTo.Console()
-                .WriteTo.File("logs/log.txt", rollingInterval: RollingInterval.Day)
-                .CreateLogger();
+            // DbContext
+            services.AddDbContext<BookingDBContext>(options =>
+                options.UseSqlServer(configuration.GetConnectionString("DBConnection")));
 
-           // builder.Host.UseSerilog();
-
-            //DB Context
-            services.AddDbContext<HotelDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-
-            //Identity
+            // Identity
             services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<HotelDbContext>()
+                .AddEntityFrameworkStores<BookingDBContext>()
                 .AddDefaultTokenProviders();
 
+            // Authentication + JWT
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            }).AddJwtBearer(options =>
+            })
+            .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -60,14 +56,21 @@ namespace Hotel.Infrastructure.DependencyInjection
                 };
             });
 
-            //Mapper
+            services.AddAuthorization();
+
+            // AutoMapper
             services.AddAutoMapper(typeof(MappingProfile));
 
-            //DI
+            // Repositories + UoW + Services
+            services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
             services.AddScoped<IHotelService, HotelService>();
             services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<ICountryService, CountryService>();
+            services.AddScoped<ICityService, CityService>();
+
+            return services;
         }
     }
 }

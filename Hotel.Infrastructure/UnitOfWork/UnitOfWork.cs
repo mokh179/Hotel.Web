@@ -12,7 +12,7 @@ namespace Hotel.Infrastructure.UnitOfWork
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly HotelDbContext _context;
+        private readonly BookingDBContext _context;
 
         public IGenericRepository<Hotel.Entities.Entities.Hotel> Hotels { get; }
         public IGenericRepository<Room> Rooms { get; }
@@ -22,7 +22,7 @@ namespace Hotel.Infrastructure.UnitOfWork
 
         public IGenericRepository<City> Cities { get; }
 
-        public UnitOfWork(HotelDbContext context)
+        public UnitOfWork(BookingDBContext context)
         {
             _context = context;
             Hotels = new GenericRepository<Hotel.Entities.Entities.Hotel>(_context);

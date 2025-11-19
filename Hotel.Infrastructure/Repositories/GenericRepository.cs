@@ -15,10 +15,10 @@ namespace Hotel.Infrastructure.Repositories
     public class GenericRepository<TEntity> : IGenericRepository<TEntity>
         where TEntity : BaseEntity
     {
-        protected readonly HotelDbContext _context;
+        protected readonly BookingDBContext _context;
         protected readonly DbSet<TEntity> _dbSet;
 
-        public GenericRepository(HotelDbContext context)
+        public GenericRepository(BookingDBContext context)
         {
             _context = context;
             _dbSet = _context.Set<TEntity>();

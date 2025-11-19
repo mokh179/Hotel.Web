@@ -27,6 +27,7 @@ namespace Hotel.Entities.Entities
         public DateTime CheckOut { get; set; }
 
         public DateRange DateRange => new DateRange(CheckIn, CheckOut);
+
         public Booking(Guid roomId, Guid userId, DateTime checkIn, DateTime checkOut)
         {
             RoomId = roomId;
