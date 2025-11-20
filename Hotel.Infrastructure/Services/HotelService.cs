@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hotel.Application.DTOs.HotelDto;
+using Hotel.Application.DTOs.Pagination;
 using Hotel.Application.Interfaces;
 using Hotel.Application.Interfaces.Services;
 using Hotel.Entities.Entities;
@@ -22,9 +23,6 @@ namespace Hotel.Infrastructure.Services
             _mapper = mapper;
         }
 
-        // ===============================
-        // GET HOTEL BY ID (WITH ROOMS + CITY + COUNTRY)
-        // ===============================
         public async Task<HotelDTO> GetByIdAsync(Guid id)
         {
             var entity = await _unitOfWork.Hotels
@@ -37,9 +35,7 @@ namespace Hotel.Infrastructure.Services
             return _mapper.Map<HotelDTO>(entity);
         }
 
-        // ===============================
-        // GET ALL HOTELS
-        // ===============================
+
         public async Task<List<HotelDTO>> GetAllAsync()
         {
             var entities = await _unitOfWork.Hotels
@@ -111,6 +107,42 @@ namespace Hotel.Infrastructure.Services
         {
             await _unitOfWork.Hotels.SoftDeleteRangeAsync(ids);
             await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task<PagedResult<HotelDTO>> SearchHotelsAsync(string name, Guid? countryId, Guid? cityId, int page, int pageSize)
+        {
+
+            var query = _unitOfWork.Hotels
+                           .Query()
+                           .Include(h => h.City)
+                           .ThenInclude(c => c.Country)
+                           .AsQueryable();
+
+
+            if (!string.IsNullOrWhiteSpace(name))
+                query = query.Where(h => h.Name.Contains(name));
+
+            if (countryId.HasValue)
+                query = query.Where(h => h.City.CountryId == countryId.Value);
+
+            if (cityId.HasValue)
+                query = query.Where(h => h.CityId == cityId.Value);
+
+            var total = await query.CountAsync();
+
+            var hotels = await query
+                .OrderBy(h => h.Name)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<HotelDTO>
+            {
+                Items = _mapper.Map<List<HotelDTO>>(hotels),
+                TotalCount = total,
+                Page = page,
+                PageSize = pageSize
+            };
         }
     }
 }

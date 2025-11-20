@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Hotel.Application.DTOs.BookingDto;
+using Hotel.Application.DTOs.Pagination;
 using Hotel.Application.Interfaces;
 using Hotel.Application.Interfaces.Services;
 using Hotel.Entities.Entities;
@@ -128,7 +129,7 @@ namespace Hotel.Infrastructure.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
-        
+
         public async Task<int> CountActiveBookingsAsync(Guid userId)
         {
             var now = DateTime.UtcNow;
@@ -156,5 +157,77 @@ namespace Hotel.Infrastructure.Services
                 .Where(b => b.CheckIn < checkOut && checkIn < b.CheckOut)
                 .AnyAsync();
         }
+
+        public async Task<PagedResult<BookingDTO>> SearchBookingsAsync(
+        Guid? userId,
+        string? hotelName,
+        string? roomNumber,
+        DateTime? from,
+        DateTime? to,
+        bool onlyAvailable,
+        int page,
+        int pageSize)
+        {
+            var query = _unitOfWork.Bookings
+                .Query()
+                .Include(b => b.Room)
+                .ThenInclude(r => r.Hotel)
+                .AsQueryable();
+
+            if (userId.HasValue)
+            {
+                query = query.Where(b => b.UserId == userId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(hotelName))
+            {
+                query = query.Where(b =>
+                    b.Room.Hotel.Name.Contains(hotelName));
+            }
+
+            if (!string.IsNullOrWhiteSpace(roomNumber))
+            {
+                query = query.Where(b =>
+                    b.Room.RoomNumber.Contains(roomNumber));
+            }
+
+            if (from.HasValue)
+                query = query.Where(b => b.CheckOut >= from.Value);
+
+            if (to.HasValue)
+                query = query.Where(b => b.CheckIn <= to.Value);
+
+            if (onlyAvailable && from.HasValue && to.HasValue)
+            {
+                var f = from.Value;
+                var t = to.Value;
+
+                var conflictedRooms = await _unitOfWork.Bookings
+                    .Query()
+                    .Where(b => f < b.CheckOut && t > b.CheckIn)
+                    .Select(b => b.RoomId)
+                    .Distinct()
+                    .ToListAsync();
+
+                query = query.Where(b => !conflictedRooms.Contains(b.RoomId));
+            }
+
+            var totalCount = await query.CountAsync();
+
+            var bookings = await query
+                .OrderByDescending(b => b.CheckIn)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<BookingDTO>
+            {
+                Items = _mapper.Map<List<BookingDTO>>(bookings),
+                TotalCount = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
+        }
+
     }
 }

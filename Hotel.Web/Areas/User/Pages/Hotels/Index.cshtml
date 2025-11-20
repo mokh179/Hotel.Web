@@ -1,36 +1,98 @@
 ﻿@page
 @model Hotel.Web.Areas.User.Pages.Hotels.IndexModel
-<link rel="stylesheet" href="~/css/user/HotelList.css" asp-append-version="true"/>
+@{
+    Layout = "/Areas/User/Pages/_UserLayout.cshtml";
+}
 
-<h2 class="title">Explore Hotels</h2>
+<link rel="stylesheet" href="~/css/user/HotelList.css" asp-append-version="true" />
 
-@if (Model.Hotels == null || Model.Hotels.Count == 0)
+<h2 class="page-title">Explore Hotels</h2>
+
+<div class="search-container">
+
+    <form method="get" class="search-box">
+
+        <div class="row g-2">
+
+            <div class="col-md-3">
+                <label class="form-label">Hotel Name</label>
+                <input name="SearchName"
+                       value="@Model.SearchName"
+                       class="form-control search-input"
+                       placeholder="Hotel name..." />
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">Country</label>
+                <select class="form-control search-input"
+                        id="countrySelect"
+                        name="CountryId">
+                    <option value="">-- Select Country --</option>
+                    @foreach (var c in Model.Countries)
+                    {
+                        <option value="@c.Id" selected="@(Model.CountryId == c.Id ? "selected" : null)">
+                            @c.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label">City</label>
+                <select class="form-control search-input"
+                        id="citySelect"
+                        name="CityId">
+                    <option value="">-- Select City --</option>
+                    @foreach (var city in Model.Cities)
+                    {
+                        <option value="@city.Id" selected="@(Model.CityId == city.Id)">
+                            @city.Name
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <button class="btn-search w-100">Search</button>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+@if (Model.Result.Items.Count == 0)
 {
-    <p>No hotels available right now.</p>
+    <p class="no-results">No hotels found.</p>
 }
 else
 {
-    <div class="hotel-grid">
-        @foreach (var hotel in Model.Hotels)
+    <div class="hotel-list">
+        @foreach (var h in Model.Result.Items)
         {
             <div class="hotel-card">
 
                 <img src="~/images/hotels/default.jpg" class="hotel-img" />
 
                 <div class="hotel-info">
-                    <h3>@hotel.Name</h3>
-                    <p class="location">@hotel.CityName, @hotel.CountryName</p>
+
+                    <h3 class="hotel-title">@h.Name</h3>
+
+                    <p class="location">
+                        @h.CityName, @h.CountryName
+                    </p>
 
                     <p class="desc">
-                        @(hotel.Description?.Length > 100
-                            ? hotel.Description.Substring(0, 100) + "..."
-                            : hotel.Description)
+                        @(h.Description?.Length > 150
+                            ? h.Description.Substring(0, 150) + "..."
+                            : h.Description)
                     </p>
 
                     <a asp-area="User"
                        asp-page="/HotelDetails"
-                       asp-route-id="@hotel.Id"
-                       class="btn-view">
+                       asp-route-id="@h.Id"
+                       class="btn-details">
                         View Details
                     </a>
                 </div>
@@ -38,4 +100,73 @@ else
             </div>
         }
     </div>
+
+    <nav class="pagination-container">
+        <ul class="pagination">
+
+            @if (Model.Result.Page > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-route-page="@(Model.Result.Page - 1)"
+                       asp-route-searchName="@Model.SearchName"
+                       asp-route-countryId="@Model.CountryId"
+                       asp-route-cityId="@Model.CityId">
+                        Previous
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.Result.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Result.Page ? "active" : "")">
+                    <a class="page-link"
+                       asp-route-page="@i"
+                       asp-route-searchName="@Model.SearchName"
+                       asp-route-countryId="@Model.CountryId"
+                       asp-route-cityId="@Model.CityId">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (Model.Result.Page < Model.Result.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-route-page="@(Model.Result.Page + 1)"
+                       asp-route-searchName="@Model.SearchName"
+                       asp-route-countryId="@Model.CountryId"
+                       asp-route-cityId="@Model.CityId">
+                        Next
+                    </a>
+                </li>
+            }
+
+        </ul>
+    </nav>
+}
+
+@section Scripts {
+
+    <script>
+        // Load cities dynamically based on country
+        document.getElementById("countrySelect").addEventListener("change", function () {
+
+            let countryId = this.value;
+
+            fetch(`/User/Hotels?handler=Cities&countryId=${countryId}`)
+                .then(res => res.json())
+                .then(cities => {
+
+                    let citySelect = document.getElementById("citySelect");
+                    citySelect.innerHTML = `<option value="">-- Select City --</option>`;
+
+                    cities.forEach(c => {
+                        citySelect.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+                    });
+                });
+        });
+    </script>
+
 }

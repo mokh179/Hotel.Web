@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - User Dashboard</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/user/user-Sidebar.css" asp-append-version="true" />
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <h2 class="logo">BookingSystem</h2>
+
+            <ul class="menu">
+                <li><a asp-area="User" asp-page="/Dashboard">🏠 Dashboard</a></li>
+                <li><a asp-area="User" asp-page="/Hotels/Index">🏨 Hotels</a></li>
+                <li><a asp-area="User" asp-page="/Booking/MyBookings">📘 My Bookings</a></li>
+                <li><a asp-area="User" asp-page="/Profile/Index">👤 My Profile</a></li>
+                <li>
+                    <form method="post" asp-area="Account" asp-page="/Logout">
+                        <button class="logout-btn">🚪 Logout</button>
+                    </form>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            @RenderBody()
+        </main>
+
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

@@ -1,4 +1,5 @@
 ﻿using Hotel.Application.DTOs.HotelDto;
+using Hotel.Application.DTOs.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,12 @@ namespace Hotel.Application.Interfaces.Services
         // Bulk operations
         Task AddRangeAsync(IEnumerable<CreateHotelDTO> dtos);
         Task SoftDeleteRangeAsync(IEnumerable<Guid> ids);
+
+        Task<PagedResult<HotelDTO>> SearchHotelsAsync(
+                                                        string name,
+                                                        Guid? countryId,
+                                                        Guid? cityId,
+                                                        int page,
+                                                        int pageSize);
     }
 }

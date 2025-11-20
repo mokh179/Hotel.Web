@@ -3,47 +3,7 @@
     gap: 20px;
 }
 
-/* SIDEBAR */
-.sidebar {
-    width: 260px;
-    background: #fff;
-    padding: 25px;
-    border-radius: 12px;
-    height: fit-content;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
 
-.side-title {
-    font-size: 20px;
-    margin-bottom: 15px;
-    font-weight: 700;
-}
-
-.side-link {
-    display: block;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 5px;
-    text-decoration: none;
-    color: #333;
-    font-weight: 500;
-}
-
-    .side-link:hover,
-    .active {
-        background: #0066ff;
-        color: #fff !important;
-    }
-
-.side-logout {
-    width: 100%;
-    background: #cc0000;
-    border: none;
-    padding: 10px;
-    color: #fff;
-    border-radius: 8px;
-    font-weight: 600;
-}
 
 /* MAIN */
 .main {

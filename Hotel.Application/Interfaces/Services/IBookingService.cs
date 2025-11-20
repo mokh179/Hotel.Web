@@ -1,4 +1,5 @@
 ﻿using Hotel.Application.DTOs.BookingDto;
+using Hotel.Application.DTOs.Pagination;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,5 +24,14 @@ namespace Hotel.Application.Interfaces.Services
         Task<int> CountActiveBookingsAsync(Guid userId);
         Task<int> CountPastBookingsAsync(Guid userId);
         Task<bool> IsRoomAvailable(Guid roomId, DateTime checkIn, DateTime checkOut);
+        Task<PagedResult<BookingDTO>> SearchBookingsAsync(
+                                                            Guid? userId,
+                                                            string? hotelName,
+                                                            string? roomNumber,
+                                                            DateTime? from,
+                                                            DateTime? to,
+                                                            bool onlyAvailable,
+                                                            int page,
+                                                            int pageSize);
     }
 }

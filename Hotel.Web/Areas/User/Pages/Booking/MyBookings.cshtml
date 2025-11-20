@@ -1,70 +1,175 @@
 ﻿@page
 @model Hotel.Web.Areas.User.Pages.Booking.MyBookingsModel
+@{
+    Layout = "/Areas/User/Pages/_UserLayout.cshtml";
+}
+
 <link rel="stylesheet" href="~/css/User/mybookings.css" asp-append-version="true" />
 
-<h2 class="title">My Bookings</h2>
+<h2 class="page-title">My Bookings</h2>
 
-@if (Model.Bookings == null || Model.Bookings.Count == 0)
+<div class="search-container">
+
+    <form method="get" class="search-box">
+
+        <div class="row g-2">
+
+            <div class="col-md-3">
+                <label class="form-label">Hotel</label>
+                <input name="Hotel" value="@Model.Hotel" placeholder="Hotel name..."
+                       class="form-control search-input" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">Room</label>
+                <input name="Room" value="@Model.Room" placeholder="Room #"
+                       class="form-control search-input" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">From</label>
+                <input type="date" name="From"
+                       value="@Model.From?.ToString("yyyy-MM-dd")"
+                       class="form-control search-input" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label">To</label>
+                <input type="date" name="To"
+                       value="@Model.To?.ToString("yyyy-MM-dd")"
+                       class="form-control search-input" />
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="Available" value="true"
+                           @(Model.Available ? "checked" : "") />
+                    Available Only
+                </label>
+                <button class="btn-search">Search</button>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+@if (Model.Result.Items.Count == 0)
 {
-        <p>You have no bookings yet.</p>
+    <p class="no-results">No bookings found matching your filters.</p>
 }
 else
 {
-        <div class="booking-list">
-        @foreach (var b in Model.Bookings)
+    <div class="booking-list">
+        @foreach (var b in Model.Result.Items)
         {
-                    <div class="booking-card">
-                        <div class="info">
-                            <h3 class="hotel">@b.HotelName</h3>
-                            <p class="room"><b>Room:</b> @b.RoomName</p>
-                            <p><b>Check-in:</b> @b.DateRange.From.ToShortDateString()</p>
-                            <p><b>Check-out:</b> @b.DateRange.To.ToShortDateString()</p>
+            <div class="booking-card">
 
+                <div class="left">
+                    <h3>@b.HotelName</h3>
+                    <p class="room"><b>Room:</b> @b.RoomName</p>
+                    <p><b>Check-in:</b> @b.DateRange.From.ToShortDateString()</p>
+                    <p><b>Check-out:</b> @b.DateRange.To.ToShortDateString()</p>
+                </div>
+
+                <div class="right">
                     @if (b.DateRange.From < DateTime.UtcNow)
                     {
-                                    <span class="past-status">Completed</span>
+                        <span class="status past">Completed</span>
                     }
                     else
                     {
-                                    <span class="active-status">Active</span>
+                        <span class="status active">Active</span>
                     }
-                        </div>
 
-                        <button class="details-btn"
-                                type="button"
-                                onclick="loadBookingDetails('@b.Id')">
-                            Details
-                        </button>
+                    <a class="btn-details"
+                       href="javascript:void(0)"
+                       onclick="loadBookingDetails('@b.Id')">
+                        Details
+                    </a>
 
-                @if (b.DateRange.From >= DateTime.UtcNow)
-                {
-                                <form method="post" asp-page-handler="Cancel" asp-route-id="@b.Id">
-                                    <button class="cancel-btn">Cancel Booking</button>
-                                </form>
-                }
-                    </div>
+                    @if (b.DateRange.From >= DateTime.UtcNow)
+                    {
+                        <form method="post" asp-page-handler="Cancel" asp-route-id="@b.Id">
+                            <button class="btn-cancel">Cancel</button>
+                        </form>
+                    }
+                </div>
+
+            </div>
         }
-        </div>
+    </div>
+
+    <nav class="pagination-container">
+        <ul class="pagination">
+
+            @if (Model.Result.Page > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-route-page="@(Model.Result.Page - 1)"
+                       asp-route-hotel="@Model.Hotel"
+                       asp-route-room="@Model.Room"
+                       asp-route-from="@Model.From"
+                       asp-route-to="@Model.To"
+                       asp-route-available="@Model.Available">
+                       Previous
+                    </a>
+                </li>
+            }
+
+            @for (int i = 1; i <= Model.Result.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.Result.Page ? "active" : "")">
+                    <a class="page-link"
+                       asp-route-page="@i"
+                       asp-route-hotel="@Model.Hotel"
+                       asp-route-room="@Model.Room"
+                       asp-route-from="@Model.From"
+                       asp-route-to="@Model.To"
+                       asp-route-available="@Model.Available">
+                        @i
+                    </a>
+                </li>
+            }
+
+            @if (Model.Result.Page < Model.Result.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link"
+                       asp-route-page="@(Model.Result.Page + 1)"
+                       asp-route-hotel="@Model.Hotel"
+                       asp-route-room="@Model.Room"
+                       asp-route-from="@Model.From"
+                       asp-route-to="@Model.To"
+                       asp-route-available="@Model.Available">
+                       Next
+                    </a>
+                </li>
+            }
+
+        </ul>
+    </nav>
 }
 
-<!-- 🔹 Modal should always exist -->
+<!-- Modal container -->
 <div class="modal fade" id="bookingDetailsModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" id="booking-details-container">
-        </div>
+        <div class="modal-content" id="booking-details-container"></div>
     </div>
 </div>
 
 @section Scripts {
-        <script>
-            function loadBookingDetails(id) {
-                fetch(`/User/Booking/MyBookings?handler=Details&id=${id}`)
-                    .then(res => res.text())
-                    .then(html => {
-                        document.getElementById("booking-details-container").innerHTML = html;
-                        var modal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
-                        modal.show();
-                    });
-            }
-        </script>
+    <script>
+        function loadBookingDetails(id) {
+            fetch(`/User/Booking/MyBookings?handler=Details&id=${id}`)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("booking-details-container").innerHTML = html;
+                    var modal = new bootstrap.Modal(document.getElementById('bookingDetailsModal'));
+                    modal.show();
+                });
+        }
+    </script>
 }

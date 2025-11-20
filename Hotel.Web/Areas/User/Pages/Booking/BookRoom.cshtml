@@ -1,5 +1,8 @@
 ﻿@page "{id:guid}"
 @model Hotel.Web.Areas.User.Pages.Booking.BookRoomModel
+@{
+    Layout = "/Areas/User/Pages/_UserLayout.cshtml";
+}
 <link rel="stylesheet" href="~/css/User/bookroom.css" asp-append-version="true"/>
 
 <h2>Book Room @Model.Room.RoomNumber</h2>
