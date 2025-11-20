@@ -1,0 +1,73 @@
+﻿/* Container */
+.forgot-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 60px;
+}
+
+/* Box */
+.forgot-box {
+    width: 380px;
+    background: #ffffff;
+    padding: 28px;
+    border-radius: 14px;
+    box-shadow: 0px 4px 18px rgba(0,0,0,0.12);
+}
+
+/* Title */
+.forgot-title {
+    font-size: 26px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+/* Subtitle */
+.forgot-subtitle {
+    text-align: center;
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Inputs */
+.forgot-input {
+    padding: 10px;
+    border-radius: 8px;
+}
+
+/* Button */
+.forgot-btn {
+    background-color: #005eff;
+    color: white;
+    font-weight: 600;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+    .forgot-btn:hover {
+        background-color: #0047c4;
+    }
+
+/* Back link */
+.forgot-links {
+    text-align: center;
+}
+
+    .forgot-links a {
+        text-decoration: none;
+        color: #005eff;
+    }
+
+        .forgot-links a:hover {
+            text-decoration: underline;
+        }
+
+/* Success message */
+.success-message {
+    margin-top: 15px;
+    text-align: center;
+    color: green;
+    font-weight: 600;
+}

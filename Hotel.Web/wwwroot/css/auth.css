@@ -22,6 +22,15 @@
     border: 1px solid #ccc;
     font-size: 15px;
 }
+.forgot-link {
+    font-size: 14px;
+    text-decoration: none;
+    color: #0066ff;
+}
+
+    .forgot-link:hover {
+        text-decoration: underline;
+    }
 
 .btn-auth {
     background: #0071c2; /* Booking blue */
@@ -47,3 +56,5 @@
 .text-danger {
     font-size: 14px;
 }
+
+

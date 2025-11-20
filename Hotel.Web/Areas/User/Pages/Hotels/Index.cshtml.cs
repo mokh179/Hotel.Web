@@ -16,6 +16,7 @@ namespace Hotel.Web.Areas.User.Pages.Hotels
         private readonly ICountryService _countryService;
         private readonly ICityService _cityService;
 
+        /*Marwa19/06/2025*/
         public IndexModel(
             IHotelService hotelService,
             ICountryService countryService,

@@ -34,9 +34,7 @@ namespace Hotel.Infrastructure.Services
             return _mapper.Map<BookingDTO>(entity);
         }
 
-        // ===============================
-        // GET ALL BOOKINGS
-        // ===============================
+
         public async Task<List<BookingDTO>> GetAllAsync()
         {
             var entities = await _unitOfWork.Bookings
