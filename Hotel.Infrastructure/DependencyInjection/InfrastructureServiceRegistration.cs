@@ -33,9 +33,12 @@ namespace Hotel.Infrastructure.DependencyInjection
                 options.UseSqlServer(configuration.GetConnectionString("DBConnection")));
 
             // Identity
-            services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
-                .AddEntityFrameworkStores<BookingDBContext>()
-                .AddDefaultTokenProviders();
+            services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+            })
+            .AddEntityFrameworkStores<BookingDBContext>()
+            .AddDefaultTokenProviders();
 
             // Authentication + JWT
             services.AddAuthentication(options =>
@@ -58,6 +61,12 @@ namespace Hotel.Infrastructure.DependencyInjection
                 };
             });
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+                options.DefaultChallengeScheme = IdentityConstants.ApplicationScheme;
+            });
             services.AddAuthorization();
 
             // AutoMapper

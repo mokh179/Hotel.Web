@@ -1,0 +1,65 @@
+﻿.title {
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+.booking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.booking-card {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+
+.info {
+    font-family: 'Segoe UI';
+}
+
+.hotel {
+    font-size: 22px;
+    font-weight: 600;
+    color: #003580;
+}
+
+.room {
+    margin-top: 5px;
+}
+
+.active-status {
+    background: #0071c2;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.past-status {
+    background: #888;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+}
+
+.price {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.cancel-btn {
+    background: #c70000;
+    color: white;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+}
+
+    .cancel-btn:hover {
+        background: #a00000;
+    }

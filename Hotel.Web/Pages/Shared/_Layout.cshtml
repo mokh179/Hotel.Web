@@ -6,6 +6,9 @@
     <title>@ViewData["Title"] - Hotel.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/auth.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/User/mybookings.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/user/HotelList.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/user/Hoteldetails.css" asp-append-version="true" />
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Hotel.Web.styles.css" asp-append-version="true" />
@@ -19,14 +22,19 @@
 
     @if (!hideNav)
     {
+        <p style="color:red;">Auth: @User.Identity.IsAuthenticated</p>
+        <p style="color:red;">User: @User.Identity.Name</p>
         <header>
             <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
                 <div class="container">
                     <a class="navbar-brand" asp-area="" asp-page="/Index">Hotel.Web</a>
+
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                         <span class="navbar-toggler-icon"></span>
                     </button>
+
                     <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+
                         <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
@@ -35,6 +43,29 @@
                                 <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                             </li>
                         </ul>
+
+                        <ul class="navbar-nav">
+                            @if (User.Identity?.IsAuthenticated ?? false)
+                            {
+                                <li class="nav-item">
+                                    <form method="post" asp-area="Account" asp-page="/Logout" class="d-inline">
+                                        <button type="submit" class="btn btn-link nav-link" style="cursor:pointer;">
+                                            Logout (@User.Identity.Name)
+                                        </button>
+                                    </form>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="Account" asp-page="/Login">Login</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-area="Account" asp-page="/Register">Register</a>
+                                </li>
+                            }
+                        </ul>
+
                     </div>
                 </div>
             </nav>

@@ -1,0 +1,41 @@
+﻿@page
+@model Hotel.Web.Areas.User.Pages.HotelsModel
+<link rel="stylesheet" href="~/css/user/HotelList.css" asp-append-version="true"/>
+
+<h2 class="title">Explore Hotels</h2>
+
+@if (Model.Hotels == null || Model.Hotels.Count == 0)
+{
+    <p>No hotels available right now.</p>
+}
+else
+{
+    <div class="hotel-grid">
+        @foreach (var hotel in Model.Hotels)
+        {
+            <div class="hotel-card">
+
+                <img src="~/images/hotels/default.jpg" class="hotel-img" />
+
+                <div class="hotel-info">
+                    <h3>@hotel.Name</h3>
+                    <p class="location">@hotel.CityName, @hotel.CountryName</p>
+
+                    <p class="desc">
+                        @(hotel.Description?.Length > 100
+                            ? hotel.Description.Substring(0, 100) + "..."
+                            : hotel.Description)
+                    </p>
+
+                    <a asp-area="User"
+                       asp-page="/HotelDetails"
+                       asp-route-id="@hotel.Id"
+                       class="btn-view">
+                        View Details
+                    </a>
+                </div>
+
+            </div>
+        }
+    </div>
+}

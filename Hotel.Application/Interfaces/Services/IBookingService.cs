@@ -20,5 +20,8 @@ namespace Hotel.Application.Interfaces.Services
         // Bulk operations
         Task AddRangeAsync(IEnumerable<CreateBookingDTO> dtos);
         Task SoftDeleteRangeAsync(IEnumerable<Guid> ids);
+
+        Task<int> CountActiveBookingsAsync(Guid userId);
+        Task<int> CountPastBookingsAsync(Guid userId);
     }
 }

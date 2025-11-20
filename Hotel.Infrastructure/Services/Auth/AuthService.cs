@@ -60,5 +60,13 @@ namespace Hotel.Infrastructure.Services.Auth
 
             return AuthResult.Success(user.Id);
         }
+
+        public async Task LogoutAsync()
+        {
+            await _signInManager.SignOutAsync();
+        }
+
+
+
     }
 }

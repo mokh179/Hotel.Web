@@ -1,0 +1,59 @@
+﻿@page "{id:guid}"
+@model Hotel.Web.Areas.User.Pages.HotelDetailsModel
+<link rel="stylesheet" href="~/css/user/Hoteldetails.css" asp-append-version="true" />
+
+<div class="hotel-header">
+    <h2>@Model.Hotel.Name</h2>
+    <p class="location">@Model.Hotel.CityName, @Model.Hotel.CountryName</p>
+</div>
+
+<div class="hotel-container">
+
+    <div class="details-section">
+        <h4>About</h4>
+        <p>@Model.Hotel.Description</p>
+
+        <h4>Contact</h4>
+        <p><b>Phone:</b> @Model.Hotel.PhoneNumber</p>
+        <p><b>Email:</b> @Model.Hotel.Email</p>
+
+        <h4>Rating</h4>
+        <p>@Model.Hotel.Rating ⭐</p>
+
+        <h4>Location</h4>
+        <p>@Model.Hotel.Location</p>
+    </div>
+
+    <div class="rooms-section">
+        <h3>Available Rooms</h3>
+
+        @if (Model.Hotel.RoomCount == 0)
+        {
+            <p>No rooms available at this hotel.</p>
+        }
+        else
+        {
+            @foreach (var room in Model.Hotel.Rooms)
+            {
+                <div class="room-card">
+                    <div class="room-info">
+                        <h4>Room @room.RoomNumber</h4>
+                        <p>
+                            <b>Type:</b> <span class="badge room-type">@room.RoomType</span>
+                        </p>
+                        <p><b>Price:</b> @room.Price EGP / night</p>
+                    </div>
+
+                    <a asp-area="User"
+                       asp-page="/BookRoom"
+                       asp-route-id="@room.Id"
+                       class="btn-book">
+                        Book Now
+                    </a>
+                </div>
+            }
+
+        }
+    </div>
+
+</div>

@@ -16,9 +16,16 @@ builder.Host.UseSerilog((context, config) =>
 // Razor Pages + Custom Routes
 builder.Services.AddRazorPages(options =>
 {
-    // Pretty URLs
+    // Account
     options.Conventions.AddAreaPageRoute("Account", "/Login", "login");
     options.Conventions.AddAreaPageRoute("Account", "/Register", "register");
+
+    // user
+    options.Conventions.AddAreaPageRoute("User", "/Index", "user");
+    options.Conventions.AddAreaPageRoute("User", "/MyBookings", "user/bookings");
+    options.Conventions.AddAreaPageRoute("User", "/Profile", "user/profile");
+    options.Conventions.AddAreaPageRoute("User", "/Hotels", "user/hotels");
+    options.Conventions.AddAreaPageRoute("User", "/HotelDetails", "user/hotel/{id}");
 
 });
 

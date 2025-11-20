@@ -11,5 +11,6 @@ namespace Hotel.Application.Interfaces.Services.Authentication
     {
         Task<AuthResult> RegisterAsync(RegisterDto model);
         Task<AuthResult> LoginAsync(LoginDto model);
+        Task LogoutAsync();
     }
 }

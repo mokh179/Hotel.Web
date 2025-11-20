@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Hotel.Infrastructure.Services
@@ -23,40 +22,72 @@ namespace Hotel.Infrastructure.Services
             _mapper = mapper;
         }
 
+        // ===============================
+        // GET HOTEL BY ID (WITH ROOMS + CITY + COUNTRY)
+        // ===============================
         public async Task<HotelDTO> GetByIdAsync(Guid id)
         {
-            var entity = await _unitOfWork.Hotels.Query()
-                                .Include(h => h.City)
-                                .ThenInclude(c => c.Country)
-                                .FirstOrDefaultAsync(h => h.Id == id);
+            var entity = await _unitOfWork.Hotels
+                .Query()
+                .Include(h => h.Rooms)
+                .Include(h => h.City)
+                    .ThenInclude(c => c.Country)
+                .FirstOrDefaultAsync(h => h.Id == id);
+
             return _mapper.Map<HotelDTO>(entity);
         }
 
+        // ===============================
+        // GET ALL HOTELS
+        // ===============================
         public async Task<List<HotelDTO>> GetAllAsync()
         {
-            var entities = await _unitOfWork.Hotels.Query()
-                                    .Include(h => h.City)
-                                    .ThenInclude(c => c.Country)
-                                    .ToListAsync();
+            var entities = await _unitOfWork.Hotels
+                .Query()
+                .Include(h => h.Rooms)
+                .Include(h => h.City)
+                    .ThenInclude(c => c.Country)
+                .ToListAsync();
+
             return _mapper.Map<List<HotelDTO>>(entities);
         }
 
         public async Task<HotelDTO> CreateAsync(CreateHotelDTO dto)
         {
             var entity = _mapper.Map<Hotel.Entities.Entities.Hotel>(dto);
+
             await _unitOfWork.Hotels.AddAsync(entity);
             await _unitOfWork.SaveChangesAsync();
+
+            // إعادة تحميل البيانات مع العلاقات
+            entity = await _unitOfWork.Hotels
+                .Query()
+                .Include(h => h.Rooms)
+                .Include(h => h.City)
+                    .ThenInclude(c => c.Country)
+                .FirstOrDefaultAsync(h => h.Id == entity.Id);
+
             return _mapper.Map<HotelDTO>(entity);
         }
 
         public async Task<HotelDTO> UpdateAsync(UpdateHotelDTO dto)
         {
             var entity = await _unitOfWork.Hotels.GetByIdAsync(dto.Id);
-            if (entity == null) throw new Exception("Hotel not found");
+            if (entity == null)
+                throw new Exception("Hotel not found");
 
             _mapper.Map(dto, entity);
+
             _unitOfWork.Hotels.Update(entity);
             await _unitOfWork.SaveChangesAsync();
+
+            // إعادة تحميل البيانات مع العلاقات
+            entity = await _unitOfWork.Hotels
+                .Query()
+                .Include(h => h.Rooms)
+                .Include(h => h.City)
+                    .ThenInclude(c => c.Country)
+                .FirstOrDefaultAsync(h => h.Id == entity.Id);
 
             return _mapper.Map<HotelDTO>(entity);
         }
@@ -67,6 +98,7 @@ namespace Hotel.Infrastructure.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
+
         public async Task AddRangeAsync(IEnumerable<CreateHotelDTO> dtos)
         {
             var entities = _mapper.Map<IEnumerable<Hotel.Entities.Entities.Hotel>>(dtos);
@@ -74,6 +106,7 @@ namespace Hotel.Infrastructure.Services
             await _unitOfWork.SaveChangesAsync();
         }
 
+   
         public async Task SoftDeleteRangeAsync(IEnumerable<Guid> ids)
         {
             await _unitOfWork.Hotels.SoftDeleteRangeAsync(ids);
