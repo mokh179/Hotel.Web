@@ -1,0 +1,20 @@
+﻿@model Hotel.Application.DTOs.BookingDto.BookingDTO
+
+<div class="modal-header">
+    <h5 class="modal-title">Booking Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+    <p><b>Hotel:</b> @Model.HotelName</p>
+    <p><b>Room:</b> @Model.RoomId</p>
+    <p><b>Check In:</b> @Model.DateRange.From.ToShortDateString()</p>
+    <p><b>Check Out:</b> @Model.DateRange.To.ToShortDateString()</p>
+    <p><b>Nights:</b> @Model.TotalNights</p>
+    <p><b>Price per night:</b> @Model.PricePerNight EGP</p>
+    <p><b>Total Price:</b> @Model.TotalPrice EGP</p>
+</div>
+
+<div class="modal-footer">
+    <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

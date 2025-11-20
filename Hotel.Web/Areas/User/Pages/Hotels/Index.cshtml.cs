@@ -4,16 +4,16 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Hotel.Web.Areas.User.Pages
+namespace Hotel.Web.Areas.User.Pages.Hotels
 {
     [Authorize]
-    public class HotelsModel : PageModel
+    public class IndexModel : PageModel
     {
         private readonly IHotelService _hotelService;
 
         public List<HotelDTO> Hotels { get; set; }
 
-        public HotelsModel(IHotelService hotelService)
+        public IndexModel(IHotelService hotelService)
         {
             _hotelService = hotelService;
         }

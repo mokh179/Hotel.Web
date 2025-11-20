@@ -12,9 +12,13 @@ namespace Hotel.Web.Pages
             _logger = logger;
         }
 
-        public void OnGet()
+        public IActionResult OnGet()
         {
-
+            if (User.Identity!.IsAuthenticated)
+            {
+                return RedirectToPage("/Dashboard", new { area = "User" });
+            }
+            return Page();
         }
     }
 }

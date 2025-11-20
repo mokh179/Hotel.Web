@@ -1,0 +1,66 @@
+﻿.profile-container {
+    max-width: 500px;
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    margin: auto;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.profile-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.profile-row {
+    margin-bottom: 15px;
+}
+
+    .profile-row label {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .profile-row span {
+        display: block;
+        background: #f6f6f6;
+        padding: 10px 12px;
+        border-radius: 8px;
+    }
+
+.btn-edit {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #0066ff;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    margin-top: 15px;
+}
+
+.btn-save {
+    width: 100%;
+    padding: 10px;
+    background: #0066ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    margin-top: 5px;
+}
+
+.btn-cancel {
+    display: inline-block;
+    margin-top: 10px;
+    text-decoration: none;
+    padding: 8px 15px;
+    background: #ccc;
+    border-radius: 8px;
+}
+
+.success-message {
+    margin-top: 15px;
+    color: #0a960a;
+    font-weight: 600;
+}

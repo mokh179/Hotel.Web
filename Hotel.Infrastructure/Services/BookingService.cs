@@ -22,9 +22,6 @@ namespace Hotel.Infrastructure.Services
             _mapper = mapper;
         }
 
-        // ===============================
-        // GET BOOKING BY ID
-        // ===============================
         public async Task<BookingDTO> GetByIdAsync(Guid id)
         {
             var entity = await _unitOfWork.Bookings
@@ -50,9 +47,7 @@ namespace Hotel.Infrastructure.Services
             return _mapper.Map<List<BookingDTO>>(entities);
         }
 
-        // ===============================
-        // CREATE BOOKING
-        // ===============================
+    
         public async Task<BookingDTO> CreateAsync(CreateBookingDTO dto)
         {
             // PricePerNight يجي من الـ Room مش من الـ DTO
@@ -152,6 +147,14 @@ namespace Hotel.Infrastructure.Services
                 .Query()
                 .Where(b => b.UserId == userId && b.CheckOut < now)
                 .CountAsync();
+        }
+        public async Task<bool> IsRoomAvailable(Guid roomId, DateTime checkIn, DateTime checkOut)
+        {
+            return !await _unitOfWork.Bookings
+                .Query()
+                .Where(b => b.RoomId == roomId)
+                .Where(b => b.CheckIn < checkOut && checkIn < b.CheckOut)
+                .AnyAsync();
         }
     }
 }

@@ -40,8 +40,7 @@ namespace Hotel.Web.Areas.Account.Pages
                 return Page();
             }
 
-            // ?? ??? ??????? ? ??? ?????? ????????
-            return RedirectToPage("/Index", new { area = "" });
+            return RedirectToPage("/Dashboard", new { area = "User" });
         }
 
     }

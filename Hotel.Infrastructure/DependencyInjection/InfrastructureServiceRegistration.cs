@@ -19,6 +19,9 @@ using Hotel.Infrastructure.Repositories;
 using Hotel.Infrastructure.Services;
 using Hotel.Application.Interfaces.Services.Authentication;
 using Hotel.Infrastructure.Services.Auth;
+using Hotel.Application.EventHandlers;
+using Hotel.Application.Interfaces.Services.Profile;
+using Hotel.Infrastructure.Services.Profile;
 
 namespace Hotel.Infrastructure.DependencyInjection
 {
@@ -72,6 +75,11 @@ namespace Hotel.Infrastructure.DependencyInjection
             // AutoMapper
             services.AddAutoMapper(typeof(MappingProfile));
 
+            services.AddMediatR(md =>
+            {
+                md.RegisterServicesFromAssembly(typeof(BookingCreatedHandler).Assembly);
+            });
+
             // Repositories + UoW + Services
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
@@ -81,6 +89,8 @@ namespace Hotel.Infrastructure.DependencyInjection
             services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<ICityService, CityService>();
             services.AddScoped<IAuthService, AuthService>();
+            services.AddScoped<IUserService, UserService>();
+
 
             return services;
         }

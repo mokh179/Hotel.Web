@@ -21,11 +21,14 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddAreaPageRoute("Account", "/Register", "register");
 
     // user
-    options.Conventions.AddAreaPageRoute("User", "/Index", "user");
+    options.Conventions.AddAreaPageRoute("User", "/Dashboard", "user");
     options.Conventions.AddAreaPageRoute("User", "/MyBookings", "user/bookings");
     options.Conventions.AddAreaPageRoute("User", "/Profile", "user/profile");
     options.Conventions.AddAreaPageRoute("User", "/Hotels", "user/hotels");
     options.Conventions.AddAreaPageRoute("User", "/HotelDetails", "user/hotel/{id}");
+    options.Conventions.AddAreaPageRoute("User", "/BookRoom", "user/book/{id}");
+    options.Conventions.AddAreaPageRoute("User", "/BookingConfirmation", "user/book/confirmed");
+
 
 });
 

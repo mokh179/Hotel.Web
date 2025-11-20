@@ -38,8 +38,8 @@ namespace Hotel.Application.Mapping
 
             #region Room
             CreateMap<Room, RoomDTO>()
-                     .ForMember(dest => dest.RoomType,
-                      opt => opt.MapFrom(src => src.RoomType.ToString()));
+                    .ForMember(dest => dest.RoomType, opt => opt.MapFrom(src => src.RoomType.ToString()))
+                    .ForMember(dest => dest.HotelName, opt => opt.MapFrom(src => src.Hotel.Name));
 
             CreateMap<CreateRoomDTO, Room>();
             CreateMap<UpdateRoomDTO, Room>();

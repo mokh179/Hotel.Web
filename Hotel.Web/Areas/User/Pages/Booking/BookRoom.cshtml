@@ -1,0 +1,33 @@
+﻿@page "{id:guid}"
+@model Hotel.Web.Areas.User.Pages.Booking.BookRoomModel
+<link rel="stylesheet" href="~/css/User/bookroom.css" asp-append-version="true"/>
+
+<h2>Book Room @Model.Room.RoomNumber</h2>
+
+<div class="booking-container">
+
+    <div class="room-info">
+        <p><b>Hotel:</b> @Model.Room.HotelName</p>
+        <p><b>Room Type:</b> @Model.Room.RoomType</p>
+        <p><b>Price:</b> @Model.Room.Price EGP per night</p>
+    </div>
+
+    <form method="post">
+        <div class="form-group mb-3">
+            <label>Check-in</label>
+            <input asp-for="Input.CheckIn" type="date" class="form-control" required />
+        </div>
+
+        <div class="form-group mb-3">
+            <label>Check-out</label>
+            <input asp-for="Input.CheckOut" type="date" class="form-control" required />
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Confirm Booking</button>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="alert alert-danger mt-3">@Model.ErrorMessage</div>
+        }
+    </form>
+</div>

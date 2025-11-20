@@ -9,6 +9,10 @@
     <link rel="stylesheet" href="~/css/User/mybookings.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/user/HotelList.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/user/Hoteldetails.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/User/bookroom.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/User/profile.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/User/dashboard.css" />
+
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Hotel.Web.styles.css" asp-append-version="true" />
@@ -22,8 +26,7 @@
 
     @if (!hideNav)
     {
-        <p style="color:red;">Auth: @User.Identity.IsAuthenticated</p>
-        <p style="color:red;">User: @User.Identity.Name</p>
+     
         <header>
             <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
                 <div class="container">

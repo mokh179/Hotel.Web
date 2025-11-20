@@ -17,6 +17,8 @@ namespace Hotel.Application.DTOs.RoomDto
         public decimal Price { get; set; }
 
         public Guid HotelId { get; set; }
+        public string HotelName { get; set; }
+
     }
 
 }

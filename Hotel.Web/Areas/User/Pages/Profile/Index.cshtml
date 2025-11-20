@@ -1,0 +1,71 @@
+﻿@page
+@model Hotel.Web.Areas.User.Pages.Profile.IndexModel
+<link rel="stylesheet" href="~/css/User/profile.css" />
+
+<h2 class="profile-title">My Profile</h2>
+
+<div class="profile-container">
+
+    @if (!Model.IsEditing)
+    {
+        <div class="profile-row">
+            <label>First Name:</label>
+            <span>@Model.Profile.FirstName</span>
+        </div>
+
+        <div class="profile-row">
+            <label>Last Name:</label>
+            <span>@Model.Profile.LastName</span>
+        </div>
+
+        <div class="profile-row">
+            <label>Email:</label>
+            <span>@Model.Profile.Email</span>
+        </div>
+
+        <a class="btn-edit" asp-area="User" asp-page="/Profile/Index" asp-route-edit="true">
+            Edit Profile
+        </a>
+
+        <a class="btn-edit" style="background:#444;margin-top:10px;"
+           asp-area="User" asp-page="/Profile/ChangePassword">
+            Change Password
+        </a>
+    }
+    else
+    {
+        <form method="post">
+
+
+            <div class="form-group mb-3">
+                <label>First Name</label>
+                <input asp-for="Profile.FirstName" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Last Name</label>
+                <input asp-for="Profile.LastName" class="form-control" />
+            </div>
+
+            <div class="form-group mb-3">
+                <label>Email</label>
+                <input asp-for="Profile.Email" class="form-control" />
+            </div>
+
+            <button class="btn-save">Save</button>
+
+            <a class="btn-cancel"
+               asp-area="User" asp-page="/Profile/Index"
+               asp-route-edit="false">
+                Cancel
+            </a>
+
+        </form>
+    }
+
+    @if (TempData["Success"] != null)
+    {
+        <p class="success-message">@TempData["Success"]</p>
+    }
+
+</div>

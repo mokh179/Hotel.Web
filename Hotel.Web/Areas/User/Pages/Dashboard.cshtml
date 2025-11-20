@@ -1,0 +1,83 @@
+﻿@page
+@model Hotel.Web.Areas.User.Pages.DashboardModel
+<link rel="stylesheet" href="~/css/User/dashboard.css" />
+
+<div class="dashboard-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <h3 class="side-title">My Account</h3>
+
+        <a asp-area="User" asp-page="/Home/Index" class="side-link active">Dashboard</a>
+        <a asp-area="User" asp-page="/Booking/MyBookings" class="side-link">My Bookings</a>
+        <a asp-area="User" asp-page="/Profile/Index" class="side-link">Edit Profile</a>
+        <a asp-area="User" asp-page="/Hotels/Index" class="side-link">Hotels</a>
+
+        <form method="post" asp-area="Account" asp-page="/Logout" class="mt-3">
+            <button class="side-logout">Logout</button>
+        </form>
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <section class="main">
+
+        <h2 class="welcome">Welcome back, @Model.FirstName 👋</h2>
+
+        <!-- Stats Cards -->
+        <div class="stats-box">
+            <div class="stat-card">
+                <h3>@Model.ActiveBookings</h3>
+                <p>Active Bookings</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>@Model.PastBookings</h3>
+                <p>Completed Trips</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>@Model.TotalBookings</h3>
+                <p>Total Bookings</p>
+            </div>
+        </div>
+
+        <!-- Recent Bookings -->
+        <h3 class="section-title">Recent Bookings</h3>
+        <div class="recent-list">
+            @if (Model.RecentBookings.Count == 0)
+            {
+                <p>No recent bookings.</p>
+            }
+            else
+            {
+                foreach (var b in Model.RecentBookings)
+                {
+                    <div class="recent-card">
+                        <h4>@b.HotelName</h4>
+                        <p>Room: @b.RoomName</p>
+                        <p>@b.DateRange.From.ToShortDateString() → @b.DateRange.To.ToShortDateString()</p>
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Suggested Hotels -->
+        <h3 class="section-title">Suggested Hotels</h3>
+        <div class="suggested-list">
+            @foreach (var h in Model.SuggestedHotels)
+            {
+                <div class="hotel-card">
+                    <h4>@h.Name</h4>
+                    <p>@h.CityName - @h.CountryName</p>
+                    <p>Rating: ⭐ @h.Rating</p>
+
+                    <a asp-area="User" asp-page="/Hotels/Details" asp-route-id="@h.Id" class="btn-view">
+                        View
+                    </a>
+                </div>
+            }
+        </div>
+
+    </section>
+</div>

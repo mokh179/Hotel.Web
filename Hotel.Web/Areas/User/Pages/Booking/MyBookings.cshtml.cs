@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace Hotel.Web.Areas.User.Pages
+namespace Hotel.Web.Areas.User.Pages.Booking
 {
     [Authorize]
     public class MyBookingsModel : PageModel
