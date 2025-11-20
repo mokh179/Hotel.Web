@@ -1,7 +1,6 @@
 ﻿using Hotel.Application.Interfaces.Services;
 using Hotel.Application.Interfaces;
 using Hotel.Application.Mapping;
-using Hotel.Application.Services;
 using Hotel.Infrastructure.Identity;
 using Hotel.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -17,6 +16,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Hotel.Infrastructure.Repositories;
+using Hotel.Infrastructure.Services;
+using Hotel.Application.Interfaces.Services.Authentication;
+using Hotel.Infrastructure.Services.Auth;
 
 namespace Hotel.Infrastructure.DependencyInjection
 {
@@ -69,6 +71,7 @@ namespace Hotel.Infrastructure.DependencyInjection
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<ICityService, CityService>();
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }

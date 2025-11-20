@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
-namespace Hotel.Application.Services
+namespace Hotel.Infrastructure.Services
 {
     public class CityService : ICityService
     {
