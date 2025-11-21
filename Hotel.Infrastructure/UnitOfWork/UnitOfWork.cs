@@ -27,6 +27,8 @@ namespace Hotel.Infrastructure.UnitOfWork
         public IGenericRepository<Country> Countries { get; }
 
         public IGenericRepository<City> Cities { get; }
+        public IGenericRepository<RoomType> RoomTypes { get; }
+
 
         public UnitOfWork(BookingDBContext context, IMediator mediator)
         {
@@ -36,30 +38,30 @@ namespace Hotel.Infrastructure.UnitOfWork
             Bookings = new GenericRepository<Booking>(_context);
             Cities = new GenericRepository<City>(_context);
             Countries = new GenericRepository<Country>(_context);
+            RoomTypes = new GenericRepository<RoomType>(_context);
             _mediator = mediator;
         }
 
-       // public async Task<int> SaveChangesAsync() => await _context.SaveChangesAsync();
         public async Task<int> SaveChangesAsync() 
         {
-            // 1) Gather Domain Events from tracked entities
+            //  Gather Domain Events from tracked entities
             var domainEvents = _context.ChangeTracker
-                .Entries<BaseEntity>()
-                .SelectMany(x => x.Entity.DomainEvents)
-                .ToList();
+             .Entries<BaseEntity>()
+             .Where(e => e.Entity.DomainEvents != null && e.Entity.DomainEvents.Any())
+             .SelectMany(e => e.Entity.DomainEvents)
+             .ToList();
 
-            // 2) Clear events before saving
+            // Clear events before saving
             foreach (var entity in _context.ChangeTracker.Entries<BaseEntity>())
                 entity.Entity.ClearDomainEvents();
 
-            // 3) Commit to DB
+            //  Commit to DB
             int result = await _context.SaveChangesAsync();
 
-            // 4) Publish events using MediatR
+            //  Publish events using MediatR
             foreach (var domainEvent in domainEvents)
             {
-                var notification = new BookingCreatedNotification((dynamic)domainEvent);
-                await _mediator.Publish(notification);
+                await _mediator.Publish(domainEvent);
             }
 
             return result;

@@ -7,8 +7,10 @@ using AutoMapper;
 using Hotel.Application.DTOs.BookingDto;
 using Hotel.Application.DTOs.DateRange;
 using Hotel.Application.DTOs.HotelDto;
+using Hotel.Application.DTOs.Locations.City;
 using Hotel.Application.DTOs.Locations.Country;
 using Hotel.Application.DTOs.RoomDto;
+using Hotel.Application.DTOs.RoomDto.RoomTypeDTO;
 using Hotel.Entities.Entities;
 using Hotel.Entities.ValueObjects;
 
@@ -77,6 +79,15 @@ namespace Hotel.Application.Mapping
             CreateMap<UpdateCountryDTO, Country>();
             #endregion
 
+            #region City
+            CreateMap<City, CityDTO>();
+            CreateMap<CreateCityDTO, City>();
+            CreateMap<UpdateCityDTO, City>();
+            #endregion
+
+            CreateMap<RoomType, RoomTypeDTO>();
+            CreateMap<CreateRoomTypeDTO, RoomType>();
+            CreateMap<UpdateRoomTypeDTO, RoomType>();
 
             CreateMap<DateRange, DateRangeDTO>().ReverseMap();
         }

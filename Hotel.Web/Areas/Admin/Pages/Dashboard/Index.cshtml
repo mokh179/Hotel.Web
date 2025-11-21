@@ -1,130 +1,135 @@
 ﻿@page
 @model Hotel.Web.Areas.Admin.Pages.Dashboard.IndexModel
-<h2 class="dash-title">Admin Dashboard</h2>
+<link rel="stylesheet" href="~/css/admin/admin.css" asp-append-version="true" />
+<div class="dashboard-wrapper">
 
-@if (Model.Stats == null)
-{
-    <p>Loading...</p>
-}
-else
-{
-    <!-- BASIC STATS -->
-    <div class="stats-grid">
+    <h2 class="dash-title">Admin Dashboard</h2>
 
-        <div class="stat-card blue">
-            <h3>@Model.Stats.TotalHotels</h3>
-            <p>Total Hotels</p>
+    @if (Model.Stats == null)
+    {
+        <p>Loading...</p>
+    }
+    else
+    {
+        <!-- BASIC STATS -->
+        <div class="stats-grid">
+
+            <div class="stat-card blue">
+                <h3>@Model.Stats.TotalHotels</h3>
+                <p>Total Hotels</p>
+            </div>
+
+            <div class="stat-card green">
+                <h3>@Model.Stats.TotalRooms</h3>
+                <p>Total Rooms</p>
+            </div>
+
+            <div class="stat-card yellow">
+                <h3>@Model.Stats.TotalBookings</h3>
+                <p>Total Bookings</p>
+            </div>
+
+            <div class="stat-card purple">
+                <h3>@Model.Stats.TotalUsers</h3>
+                <p>Total Users</p>
+            </div>
+
         </div>
 
-        <div class="stat-card green">
-            <h3>@Model.Stats.TotalRooms</h3>
-            <p>Total Rooms</p>
+        <!-- ADVANCED STATS -->
+        <h3 class="section-title">Advanced Statistics</h3>
+
+        <div class="advanced-grid">
+
+            <div class="adv-card">
+                <h4>@Model.Stats.TodayBookings</h4>
+                <p>Bookings Today</p>
+            </div>
+
+            <div class="adv-card">
+                <h4>@Model.Stats.FutureBookings</h4>
+                <p>Upcoming Bookings</p>
+            </div>
+
+            <div class="adv-card">
+                <h4>@Model.Stats.PastBookings</h4>
+                <p>Completed Bookings</p>
+            </div>
+
+            <div class="adv-card">
+                <h4>@Model.Stats.TopHotelName</h4>
+                <p>Most Booked Hotel</p>
+            </div>
+
+            <div class="adv-card">
+                <h4>@Model.Stats.MostBookedRoomType</h4>
+                <p>Most Requested Room Type</p>
+            </div>
+
+            <div class="adv-card">
+                <h4>@Model.Stats.TotalRevenue.ToString("C")</h4>
+                <p>Total Revenue</p>
+            </div>
+
+            <div class="adv-card">
+                <h4>@Model.Stats.AverageStayLength.ToString("0.0") days</h4>
+                <p>Average Stay Duration</p>
+            </div>
+
         </div>
 
-        <div class="stat-card yellow">
-            <h3>@Model.Stats.TotalBookings</h3>
-            <p>Total Bookings</p>
+        <!-- RECENT BOOKINGS -->
+        <h3 class="section-title">Recent Bookings</h3>
+
+        <div class="table-wrapper">
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Hotel</th>
+                        <th>Room</th>
+                        <th>From</th>
+                        <th>To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model.Stats.RecentBookings)
+                    {
+                        <tr>
+                            <td>@b.UserId</td>
+                            <td>@b.HotelName</td>
+                            <td>@b.RoomName</td>
+                            <td>@b.DateRange.From.ToShortDateString()</td>
+                            <td>@b.DateRange.To.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
 
-        <div class="stat-card purple">
-            <h3>@Model.Stats.TotalUsers</h3>
-            <p>Total Users</p>
+        <!-- RECENT USERS -->
+        <h3 class="section-title">Recent Users</h3>
+
+        <div class="table-wrapper">
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model.Stats.RecentUsers)
+                    {
+                        <tr>
+                            <td>@($"{u.FirstName} {u.LastName}")</td>
+                            <td>@u.Email</td>
+                            <td>@u.CreatedAt.Value</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
-
-    </div>
-
-    <!-- ADVANCED STATS -->
-    <h3 class="section-title">Advanced Statistics</h3>
-
-    <div class="advanced-grid">
-
-        <div class="adv-card">
-            <h4>@Model.Stats.TodayBookings</h4>
-            <p>Bookings Today</p>
-        </div>
-
-        <div class="adv-card">
-            <h4>@Model.Stats.FutureBookings</h4>
-            <p>Upcoming Bookings</p>
-        </div>
-
-        <div class="adv-card">
-            <h4>@Model.Stats.PastBookings</h4>
-            <p>Completed Bookings</p>
-        </div>
-
-        <div class="adv-card">
-            <h4>@Model.Stats.TopHotelName</h4>
-            <p>Most Booked Hotel</p>
-        </div>
-
-        <div class="adv-card">
-            <h4>@Model.Stats.MostBookedRoomType</h4>
-            <p>Most Requested Room Type</p>
-        </div>
-
-        <div class="adv-card">
-            <h4>@Model.Stats.TotalRevenue.ToString("C")</h4>
-            <p>Total Revenue</p>
-        </div>
-
-        <div class="adv-card">
-            <h4>@Model.Stats.AverageStayLength.ToString("0.0") days</h4>
-            <p>Average Stay Duration</p>
-        </div>
-
-    </div>
-
-
-    <!-- RECENT BOOKINGS -->
-    <h3 class="section-title">Recent Bookings</h3>
-
-    <table class="recent-table">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Hotel</th>
-                <th>Room</th>
-                <th>From</th>
-                <th>To</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var b in Model.Stats.RecentBookings)
-            {
-                <tr>
-                    <td>@b.UserId</td>
-                    <td>@b.HotelName</td>
-                    <td>@b.RoomName</td>
-                    <td>@b.DateRange.From.ToShortDateString()</td>
-                    <td>@b.DateRange.To.ToShortDateString()</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-
-    <!-- RECENT USERS -->
-    <h3 class="section-title">Recent Users</h3>
-
-    <table class="recent-table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Joined</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var u in Model.Stats.RecentUsers)
-            {
-                <tr>
-                    <td>@($"{u.FirstName} {u.LastName}")</td>
-                    <td>@u.Email</td>
-                    <td>@u.CreatedAt.Value</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
- 
+    }
+</div>

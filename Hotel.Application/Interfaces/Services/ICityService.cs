@@ -13,7 +13,7 @@ namespace Hotel.Application.Interfaces.Services
         Task<CityDTO> GetByIdAsync(Guid id);
         Task<CityDTO> CreateAsync(CreateCityDTO dto);
         Task<CityDTO> UpdateAsync(UpdateCityDTO dto);
-        Task DeleteAsync(Guid id);
+        Task<bool> DeleteAsync(Guid id);
         Task<List<CityDTO>> GetByCountryAsync(Guid countryId); 
     }
 }

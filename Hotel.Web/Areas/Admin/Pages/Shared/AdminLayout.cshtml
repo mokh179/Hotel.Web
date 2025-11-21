@@ -10,6 +10,27 @@
 
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/Admin/admin-sidebar.css" asp-append-version="true" />
+
+    <style>
+        /* FIX: Make wrapper a horizontal layout */
+        .admin-wrapper {
+            display: flex;
+            flex-direction: row;
+            min-height: 100vh;
+        }
+
+        /* FIX: Push content next to sidebar */
+        .content {
+            margin-left: 240px; /* same width as sidebar */
+            padding: 25px;
+            width: calc(100% - 240px);
+        }
+
+        .content-inner {
+            max-width: 1200px;
+        }
+    </style>
+
 </head>
 <body>
 
@@ -20,11 +41,33 @@
             <h3 class="brand">Admin</h3>
 
             <ul class="menu">
+
                 <li><a asp-area="Admin" asp-page="/Index">Dashboard</a></li>
+
                 <li><a asp-area="Admin" asp-page="/Hotels/Index">Hotels</a></li>
-                <li><a asp-area="Admin" asp-page="/Rooms/Index">Rooms</a></li>
+
                 <li><a asp-area="Admin" asp-page="/Bookings/Index">Bookings</a></li>
+
                 <li><a asp-area="Admin" asp-page="/Users/Index">Users</a></li>
+
+                <!-- Locations (submenu) -->
+                <li class="submenu">
+                    <span class="submenu-title">Locations</span>
+                    <ul class="submenu-items">
+                        <li><a asp-area="Admin" asp-page="/Locations/Countries/Index">Countries</a></li>
+                        <li><a asp-area="Admin" asp-page="/Locations/Cities/Index">Cities</a></li>
+                    </ul>
+                </li>
+
+                <!-- Manage Rooms (submenu) -->
+                <li class="submenu">
+                    <span class="submenu-title">Manage Rooms</span>
+                    <ul class="submenu-items">
+                        <li><a asp-area="Admin" asp-page="/ManageRooms/RoomTypes/Index">Room Types</a></li>
+                        <li><a asp-area="Admin" asp-page="/ManageRooms/Rooms/Index">Rooms</a></li>
+                    </ul>
+                </li>
+
             </ul>
 
             <form method="post" asp-area="Account" asp-page="/Logout">
@@ -42,5 +85,15 @@
     </div>
 
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Submenu Toggle Script -->
+    <script>
+        document.querySelectorAll('.submenu-title').forEach(item => {
+            item.addEventListener('click', () => {
+                item.parentElement.classList.toggle('open');
+            });
+        });
+    </script>
+
 </body>
 </html>

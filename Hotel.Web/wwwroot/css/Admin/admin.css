@@ -91,3 +91,7 @@
     .recent-table tr:hover {
         background: #f1f1f1;
     }
+.dashboard-wrapper {
+    max-width: 1100px;
+    margin: 0 auto;
+}

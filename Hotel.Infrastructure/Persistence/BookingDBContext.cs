@@ -21,6 +21,7 @@ namespace Hotel.Infrastructure.Persistence
         public DbSet<Booking> Bookings => Set<Booking>();
         public DbSet<Country> Countries => Set<Country>();
         public DbSet<City> Cities => Set<City>();
+        public DbSet<RoomType> RoomTypes => Set<RoomType>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -32,6 +33,7 @@ namespace Hotel.Infrastructure.Persistence
             modelBuilder.Entity<Booking>().HasQueryFilter(b => !b.IsDeleted);
             modelBuilder.Entity<Country>().HasQueryFilter(b => !b.IsDeleted);
             modelBuilder.Entity<City>().HasQueryFilter(b => !b.IsDeleted);
+            modelBuilder.Entity<RoomType>().HasQueryFilter(b => !b.IsDeleted);
 
             modelBuilder.Entity<Hotel.Entities.Entities.Hotel>()
                 .HasOne(h => h.City)

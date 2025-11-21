@@ -32,6 +32,10 @@ builder.Services.AddRazorPages(options =>
     //Admin
      options.Conventions.AddAreaPageRoute("Admin", "/Dashboard/Index", "admin");
      options.Conventions.AddAreaPageRoute("Admin", "/Hotels", "admin/hotels");
+     options.Conventions.AddAreaPageRoute("Admin", "/Locations/Countries", "admin/countries");
+     options.Conventions.AddAreaPageRoute("Admin", "/Locations/Cities", "admin/cities");
+     options.Conventions.AddAreaPageRoute("Admin", "/ManageRooms/RoomTypes/Index", "admin/roomtypes");
+     options.Conventions.AddAreaPageRoute("Admin", "/Locations/Cities", "admin/cities");
 
 
 });

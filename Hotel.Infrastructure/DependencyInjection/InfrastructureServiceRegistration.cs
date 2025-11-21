@@ -95,6 +95,7 @@ namespace Hotel.Infrastructure.DependencyInjection
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IStatisticsService, StatisticsService>();
+            services.AddScoped<IRoomTypeService, RoomTypeService>();
 
 
             return services;

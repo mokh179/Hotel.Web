@@ -1,5 +1,4 @@
-﻿using Hotel.Entities.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,6 +14,7 @@ namespace Hotel.Entities.Entities
         public string RoomNumber { get; set; }
 
         [Required]
+        public Guid RoomTypeId { get; set; }
         public RoomType RoomType { get; set; }
 
         [Range(1, 10000)]

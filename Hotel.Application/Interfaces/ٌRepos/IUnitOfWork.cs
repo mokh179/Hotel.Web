@@ -14,6 +14,7 @@ namespace Hotel.Application.Interfaces
         IGenericRepository<Booking> Bookings { get; }
          IGenericRepository<Country> Countries { get; }
          IGenericRepository<City> Cities { get; }
+         IGenericRepository<RoomType> RoomTypes { get; }
         Task<int> SaveChangesAsync();
     }
 }

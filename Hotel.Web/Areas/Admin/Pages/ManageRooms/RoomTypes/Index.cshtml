@@ -1,0 +1,219 @@
+﻿@page
+@model Hotel.Web.Areas.Admin.Pages.ManageRooms.RoomTypes.IndexModel
+
+@{
+    ViewData["Title"] = "Room Types";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link href="~/css/admin/rooms/roomtypes.css" rel="stylesheet" asp-append-version="true" />
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Room Types</h2>
+
+        <button class="btn btn-success" id="btnAdd" data-bs-toggle="modal" data-bs-target="#roomTypeModal">
+            Add Room Type
+        </button>
+    </div>
+
+    @if (Model.RoomTypes == null || !Model.RoomTypes.Any())
+    {
+        <div class="empty-box text-center p-5 my-4">
+            <h4 class="mb-3 text-muted">No room types found</h4>
+            <p class="text-secondary mb-4">Click below to add your first room type.</p>
+
+            <button class="btn btn-success btn-lg" id="btnAdd" data-bs-toggle="modal" data-bs-target="#roomTypeModal">
+                + Add First Room Type
+            </button>
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th style="width: 160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="roomTypesList">
+                @foreach (var t in Model.RoomTypes)
+                {
+                    <tr id="roomtype_@t.Id">
+                        <td>@t.Name</td>
+                        <td>@t.Description</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm btn-edit" data-id="@t.Id">Edit</button>
+                            <button class="btn btn-danger btn-sm btn-delete" data-id="@t.Id">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="roomTypeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="roomTypeForm">
+                    @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomTypeModalLabel">Add Room Type</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden" id="Input_Id" name="Id" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input id="Input_Name" name="Name" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea id="Input_Description" name="Description" class="form-control"></textarea>
+                    </div>
+
+                    <div id="modalErrors" class="text-danger"></div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="modalSave" class="btn btn-primary">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    async function getJson(url) {
+        const res = await fetch(url);
+        return await res.json();
+    }
+
+    function rowTemplate(t) {
+        return `
+            <tr id="roomtype_${t.id}">
+                <td>${t.name}</td>
+                <td>${t.description ?? ""}</td>
+                <td>
+                    <button class="btn btn-warning btn-sm btn-edit" data-id="${t.id}">Edit</button>
+                    <button class="btn btn-danger btn-sm btn-delete" data-id="${t.id}">Delete</button>
+                </td>
+            </tr>
+        `;
+    }
+
+    function addRow(t) {
+        document.getElementById("roomTypesList")
+            ?.insertAdjacentHTML("afterbegin", rowTemplate(t));
+        bindEvents();
+    }
+
+    function updateRow(t) {
+        const row = document.getElementById("roomtype_" + t.id);
+        if (row) row.outerHTML = rowTemplate(t);
+        bindEvents();
+    }
+
+    function deleteRow(id) {
+        document.getElementById("roomtype_" + id)?.remove();
+    }
+
+    function bindEvents() {
+
+        document.querySelectorAll(".btn-edit").forEach(btn => {
+            btn.onclick = async () => {
+                const id = btn.dataset.id;
+                const t = await getJson(`?handler=RoomType&id=${id}`);
+
+                document.getElementById("Input_Id").value = t.id;
+                document.getElementById("Input_Name").value = t.name;
+                document.getElementById("Input_Description").value = t.description ?? "";
+
+                document.getElementById("modalErrors").innerHTML = "";
+                document.getElementById("roomTypeModalLabel").innerText = "Edit Room Type";
+
+                new bootstrap.Modal(document.getElementById("roomTypeModal")).show();
+            };
+        });
+
+        document.querySelectorAll(".btn-delete").forEach(btn => {
+            btn.onclick = async () => {
+                if (!confirm("Are you sure you want to delete this room type?")) return;
+                 
+                   const id = btn.dataset.id;
+                    const fd = new FormData();
+                    fd.append("id", id);
+
+                    const res = await fetch(`?handler=DeleteAjax`, {
+                        method: "POST",
+                        body: fd
+                    });               
+                    const data = await res.json();
+
+                if (data.success) deleteRow(id);
+            };
+        });
+    }
+
+    bindEvents();
+
+    document.getElementById("btnAdd").onclick = () => {
+        document.getElementById("roomTypeForm").reset();
+        document.getElementById("Input_Id").value = "";
+        document.getElementById("modalErrors").innerHTML = "";
+        document.getElementById("roomTypeModalLabel").innerText = "Add Room Type";
+    };
+
+document.getElementById("roomTypeForm").addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const id = document.getElementById("Input_Id").value;
+    const form = new FormData(e.target);
+    const handler = id ? "EditAjax" : "CreateAjax";
+
+    const res = await fetch(`?handler=${handler}`, {
+        method: "POST",
+        body: form
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+        document.getElementById("modalErrors").innerHTML =
+            (data.errors || ["Invalid server response."]).join("<br>");
+        return;
+    }
+
+    // Normalize PascalCase → camelCase
+    const t = {
+        id: data.type.id ?? data.type.Id,
+        name: data.type.name ?? data.type.Name,
+        description: data.type.description ?? data.type.Description
+    };
+
+    if (id) updateRow(t);
+    else addRow(t);
+
+    bootstrap.Modal.getInstance(document.getElementById("roomTypeModal")).hide();
+});
+document.addEventListener("hidden.bs.modal", function (event) {
+    document.querySelectorAll('.modal-backdrop')
+        .forEach(el => el.remove());
+});
+</script>

@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel.Application.DTOs.RoomDto
+namespace Hotel.Application.DTOs.RoomDto.RoomTypeDTO
 {
-    public class UpdateRoomDTO : CreateRoomDTO
+    public class UpdateRoomTypeDTO:CreateRoomTypeDTO
     {
-        [Required]
         public Guid Id { get; set; }
-    }
 
+    }
 }
