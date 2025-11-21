@@ -55,6 +55,10 @@ namespace Hotel.Infrastructure.Repositories
             }
             _dbSet.UpdateRange(entities);
         }
+        public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate)
+        {
+            return await _dbSet.AnyAsync(predicate);
+        }
 
         public async Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate) =>
             await _dbSet.Where(predicate).Where(x => !x.IsDeleted).ToListAsync();

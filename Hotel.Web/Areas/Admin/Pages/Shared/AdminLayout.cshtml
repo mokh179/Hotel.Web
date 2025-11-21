@@ -1,0 +1,46 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Admin/admin-sidebar.css" asp-append-version="true" />
+</head>
+<body>
+
+    <div class="admin-wrapper">
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3 class="brand">Admin</h3>
+
+            <ul class="menu">
+                <li><a asp-area="Admin" asp-page="/Index">Dashboard</a></li>
+                <li><a asp-area="Admin" asp-page="/Hotels/Index">Hotels</a></li>
+                <li><a asp-area="Admin" asp-page="/Rooms/Index">Rooms</a></li>
+                <li><a asp-area="Admin" asp-page="/Bookings/Index">Bookings</a></li>
+                <li><a asp-area="Admin" asp-page="/Users/Index">Users</a></li>
+            </ul>
+
+            <form method="post" asp-area="Account" asp-page="/Logout">
+                <button class="logout-btn">Logout</button>
+            </form>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="content-inner">
+                @RenderBody()
+            </div>
+        </div>
+
+    </div>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

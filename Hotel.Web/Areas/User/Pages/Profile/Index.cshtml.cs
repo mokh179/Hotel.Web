@@ -1,4 +1,4 @@
-using Hotel.Application.DTOs.UserProfileDto;
+using Hotel.Application.DTOs.UserProfileDTO;
 using Hotel.Application.Interfaces.Services.Profile;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +18,7 @@ namespace Hotel.Web.Areas.User.Pages.Profile
         }
 
         [BindProperty]
-        public UserProfileDTO Profile { get; set; }
+        public UserDTO Profile { get; set; }
         public bool IsEditing { get; set; }
 
         public async Task OnGet(bool edit = false)

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel.Application.DTOs.UserProfileDto
+namespace Hotel.Application.DTOs.UserProfileDTO
 {
-    public class UserProfileDTO
+    public class UserDTO
     {
         public Guid Id { get; set; }
         [Required, StringLength(100)]
@@ -18,5 +18,9 @@ namespace Hotel.Application.DTOs.UserProfileDto
 
         [Required, EmailAddress]
         public string Email { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
+
+
     }
 }

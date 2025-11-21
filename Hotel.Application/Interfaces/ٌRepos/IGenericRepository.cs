@@ -27,5 +27,8 @@ namespace Hotel.Application.Interfaces
         Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
         IQueryable<TEntity> Query();
 
+        Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate);
+
+
     }
 }

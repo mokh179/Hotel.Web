@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Hotel.Application.DTOs.UserProfileDto
+namespace Hotel.Application.DTOs.UserProfileDTO
 {
     public class ChangePasswordDTO
     {

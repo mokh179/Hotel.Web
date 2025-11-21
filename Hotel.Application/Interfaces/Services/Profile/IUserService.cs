@@ -1,4 +1,5 @@
-﻿using Hotel.Application.DTOs.UserProfileDto;
+﻿using Hotel.Application.DTOs.UserProfileDTO;
+using Hotel.Application.DTOs.UserProfileDTO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,11 @@ namespace Hotel.Application.Interfaces.Services.Profile
 {
     public interface IUserService
     {
-        Task<UserProfileDTO> GetProfileAsync(Guid userId);
-        Task UpdateProfileAsync(UserProfileDTO dto);
+        Task<UserDTO> GetProfileAsync(Guid userId);
+        Task UpdateProfileAsync(UserDTO dto);
         Task ChangePasswordAsync(Guid userId, ChangePasswordDTO dto);
+
+        Task<List<UserDTO>> GetAllAsync();
 
     }
 }

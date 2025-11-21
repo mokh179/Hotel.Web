@@ -1,0 +1,165 @@
+﻿#hotelsList {
+    margin-top: 15px;
+}
+
+#searchForm {
+    background: #fff;
+    padding: 12px 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 9px rgba(0,0,0,0.08);
+}
+
+    #searchForm .form-control,
+    #searchForm .form-select {
+        border-radius: 8px;
+        height: 42px;
+    }
+
+    #searchForm button {
+        height: 42px;
+        padding: 0 18px;
+    }
+
+.hotel-card .card {
+    border-radius: 12px;
+    overflow: hidden;
+    transition: 0.25s;
+    border: none;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
+
+    .hotel-card .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    }
+
+.card .card-img-top {
+    height: 160px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+}
+
+.card-text {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+    .card-body .btn {
+        margin-right: 4px;
+    }
+
+.pagination .page-item .page-link {
+    border-radius: 6px;
+    margin: 0 3px;
+    border: none;
+    color: #333;
+}
+
+.pagination .page-item.active .page-link {
+    background: #1e1e2d;
+    color: #fff;
+    border-radius: 6px;
+}
+
+.modal-content {
+    border-radius: 14px;
+    border: none;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: #1e1e2d;
+    color: #fff;
+    border-radius: 14px 14px 0 0;
+}
+
+.modal-body {
+    background: #fafafa;
+}
+
+.modal-footer {
+    background: #f1f1f1;
+}
+
+.modal-body .form-control,
+.modal-body .form-select,
+.modal-body textarea {
+    border-radius: 8px;
+}
+
+.btn-danger {
+    background: #e63946;
+    border: none;
+}
+
+    .btn-danger:hover {
+        background: #d62828;
+    }
+
+.btn-info {
+    background: #1d8cf8;
+    border: none;
+}
+
+    .btn-info:hover {
+        background: #1a7bd9;
+    }
+
+.btn-warning {
+    background: #f0ad4e;
+    border: none;
+    color: #fff;
+}
+
+    .btn-warning:hover {
+        background: #e29a3c;
+    }
+
+.btn-success {
+    background: #28a745;
+    border: none;
+}
+
+    .btn-success:hover {
+        background: #218838;
+    }
+
+.fade-in {
+    animation: fadeIn 0.35s ease-in-out;
+}
+
+.fade-out {
+    animation: fadeOut 0.35s forwards ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+}

@@ -1,4 +1,4 @@
-using Hotel.Application.DTOs.UserProfileDto;
+using Hotel.Application.DTOs.UserProfileDTO;
 using Hotel.Application.Interfaces.Services.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;

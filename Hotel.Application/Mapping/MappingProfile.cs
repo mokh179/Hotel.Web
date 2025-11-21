@@ -7,6 +7,7 @@ using AutoMapper;
 using Hotel.Application.DTOs.BookingDto;
 using Hotel.Application.DTOs.DateRange;
 using Hotel.Application.DTOs.HotelDto;
+using Hotel.Application.DTOs.Locations.Country;
 using Hotel.Application.DTOs.RoomDto;
 using Hotel.Entities.Entities;
 using Hotel.Entities.ValueObjects;
@@ -20,18 +21,19 @@ namespace Hotel.Application.Mapping
 
             #region Hotel
             CreateMap<Hotel.Entities.Entities.Hotel, HotelDTO>()
-                          .ForMember(dest => dest.CityName,
-                                     opt => opt.MapFrom(src => src.City.Name))
-                          .ForMember(dest => dest.CountryName,
-                                     opt => opt.MapFrom(src => src.City.Country.Name))
-                          .ForMember(dest => dest.RoomCount,
-                                     opt => opt.MapFrom(src => src.Rooms.Count))
-                          .ForMember(dest => dest.Rooms,
-                                     opt => opt.MapFrom(src => src.Rooms));
+                .ForMember(dest => dest.CityName,
+                    opt => opt.MapFrom(src => src.City.Name))
+                .ForMember(dest => dest.CountryName,
+                    opt => opt.MapFrom(src => src.City.Country.Name))
+                .ForMember(dest => dest.CountryId,
+                    opt => opt.MapFrom(src => src.City.CountryId))       
+                .ForMember(dest => dest.Rooms,
+                    opt => opt.MapFrom(src => src.Rooms))
+                .ForMember(dest => dest.RoomCount,
+                    opt => opt.MapFrom(src => src.Rooms.Count)).ReverseMap();
 
-
-            CreateMap<CreateHotelDTO, Hotel.Entities.Entities.Hotel>();
-            CreateMap<UpdateHotelDTO, Hotel.Entities.Entities.Hotel>();
+            CreateMap<CreateHotelDTO, Hotel.Entities.Entities.Hotel>().ReverseMap();
+            CreateMap<UpdateHotelDTO, Hotel.Entities.Entities.Hotel>().ReverseMap();
             #endregion
 
 
@@ -66,7 +68,13 @@ namespace Hotel.Application.Mapping
                                                     }));
 
             CreateMap<CreateBookingDTO, Booking>();
-            CreateMap<UpdateBookingDTO, Booking>(); 
+            CreateMap<UpdateBookingDTO, Booking>();
+            #endregion
+
+            #region Country
+            CreateMap<Country, CountryDTO>();
+            CreateMap<CreateCountryDTO, Country>();
+            CreateMap<UpdateCountryDTO, Country>();
             #endregion
 
 

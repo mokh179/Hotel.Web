@@ -1,4 +1,4 @@
-﻿using Hotel.Application.DTOs.UserProfileDto;
+﻿using Hotel.Application.DTOs.UserProfileDTO;
 using Hotel.Application.Interfaces.Services.Profile;
 using Hotel.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
@@ -19,11 +19,11 @@ namespace Hotel.Infrastructure.Services.Profile
             _userManager = userManager;
         }
 
-        public async Task<UserProfileDTO> GetProfileAsync(Guid userId)
+        public async Task<UserDTO> GetProfileAsync(Guid userId)
         {
             var user = await _userManager.FindByIdAsync(userId.ToString());
 
-            return new UserProfileDTO
+            return new UserDTO
             {
                 Id = user.Id,
                 FirstName = user.FirstName,
@@ -32,7 +32,7 @@ namespace Hotel.Infrastructure.Services.Profile
             };
         }
 
-        public async Task UpdateProfileAsync(UserProfileDTO model)
+        public async Task UpdateProfileAsync(UserDTO model)
         {
             var user = await _userManager.FindByIdAsync(model.Id.ToString());
 
@@ -73,6 +73,23 @@ namespace Hotel.Infrastructure.Services.Profile
 
             if (!result.Succeeded)
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+        }
+
+        public async Task<List<UserDTO>> GetAllAsync()
+        {
+            var users = _userManager.Users.ToList();
+
+            var list = users.Select(u => new UserDTO
+            {
+                Id = u.Id,
+                FirstName = u.FirstName, 
+                LastName = u.LastName,
+                Email = u.Email,
+                CreatedAt = u.CreatedAt
+
+            }).ToList();
+
+            return list;
         }
 
     }

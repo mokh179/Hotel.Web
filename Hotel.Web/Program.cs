@@ -29,6 +29,10 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AddAreaPageRoute("User", "/BookRoom", "user/book/{id}");
     options.Conventions.AddAreaPageRoute("User", "/BookingConfirmation", "user/book/confirmed");
 
+    //Admin
+     options.Conventions.AddAreaPageRoute("Admin", "/Dashboard/Index", "admin");
+     options.Conventions.AddAreaPageRoute("Admin", "/Hotels", "admin/hotels");
+
 
 });
 
