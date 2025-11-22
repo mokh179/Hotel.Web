@@ -2,11 +2,14 @@ using AutoMapper;
 using Hotel.Application.DTOs.Locations.City;
 using Hotel.Application.DTOs.Locations.Country;
 using Hotel.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Locations
 {
+    [Authorize]
+
     [IgnoreAntiforgeryToken]
     public class CitiesModel : PageModel
     {

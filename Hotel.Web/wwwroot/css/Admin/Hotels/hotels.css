@@ -1,165 +1,132 @@
-﻿#hotelsList {
-    margin-top: 15px;
+﻿/* ================================
+   HOTELS INDEX PAGE STYLING
+   ================================ */
+
+/* Title */
+h2 {
+    font-weight: 700;
+    color: #1f1f2d;
 }
 
-#searchForm {
-    background: #fff;
-    padding: 12px 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 9px rgba(0,0,0,0.08);
+/* Filters */
+#filters input,
+#filters select {
+    border-radius: 8px;
 }
 
-    #searchForm .form-control,
-    #searchForm .form-select {
-        border-radius: 8px;
-        height: 42px;
-    }
-
-    #searchForm button {
-        height: 42px;
-        padding: 0 18px;
-    }
-
+/* ------- CARDS GRID ------- */
 .hotel-card .card {
-    border-radius: 12px;
-    overflow: hidden;
-    transition: 0.25s;
     border: none;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 5px 16px rgba(0,0,0,0.08);
+    transition: all 0.25s ease;
 }
 
     .hotel-card .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+        transform: translateY(-6px);
+        box-shadow: 0 8px 22px rgba(0,0,0,0.12);
     }
 
-.card .card-img-top {
-    height: 160px;
-    object-fit: cover;
+.hotel-card img {
+    border-bottom: 4px solid #f0f0f0;
 }
 
-.card-title {
-    font-size: 1.15rem;
+/* Card title */
+.hotel-card .card-title {
+    color: #1d1d2f;
     font-weight: 600;
+    font-size: 1.2rem;
+    margin-bottom: 0.4rem;
 }
 
-.card-text {
-    font-size: 0.875rem;
-    color: #666;
+/* City & Country */
+.hotel-card .text-muted {
+    font-size: 0.95rem;
 }
 
-.card-body {
-    display: flex;
-    flex-direction: column;
+/* Description */
+.hotel-card p.small {
+    min-height: 40px;
 }
 
-    .card-body .btn {
-        margin-right: 4px;
+/* Buttons */
+.hotel-card .btn {
+    border-radius: 6px;
+}
+
+/* Info button */
+.hotel-card .btn-info {
+    background: #2296f3;
+    border-color: #2296f3;
+}
+
+    .hotel-card .btn-info:hover {
+        background: #1d86da;
+        border-color: #1d86da;
     }
+
+/* Edit */
+.hotel-card .btn-warning {
+    background: #ffca3a;
+    border-color: #ffca3a;
+    color: #000;
+}
+
+/* Delete */
+.hotel-card .btn-danger {
+    background: #e63946;
+    border-color: #e63946;
+}
+
+/* ------- PAGINATION ------- */
 
 .pagination .page-item .page-link {
     border-radius: 6px;
-    margin: 0 3px;
-    border: none;
+    margin: 0 2px;
     color: #333;
+    border: 1px solid #ddd;
 }
 
 .pagination .page-item.active .page-link {
-    background: #1e1e2d;
+    background: #1f1f2d;
+    border-color: #1f1f2d;
     color: #fff;
-    border-radius: 6px;
 }
 
+.pagination .page-item.disabled .page-link {
+    opacity: 0.5;
+}
+
+/* ------- MODAL ------- */
+
 .modal-content {
-    border-radius: 14px;
-    border: none;
-    box-shadow: 0 5px 25px rgba(0,0,0,0.2);
+    border-radius: 12px;
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
 }
 
 .modal-header {
-    background: #1e1e2d;
+    background: #1f1f2d;
     color: #fff;
-    border-radius: 14px 14px 0 0;
+    border-bottom: none;
+    border-radius: 12px 12px 0 0;
 }
 
 .modal-body {
     background: #fafafa;
 }
 
-.modal-footer {
-    background: #f1f1f1;
+.form-control,
+.form-select {
+    border-radius: 8px !important;
 }
 
-.modal-body .form-control,
-.modal-body .form-select,
-.modal-body textarea {
-    border-radius: 8px;
+#modalErrors {
+    margin-top: 6px;
+    color: #e63946;
 }
 
-.btn-danger {
-    background: #e63946;
-    border: none;
-}
-
-    .btn-danger:hover {
-        background: #d62828;
-    }
-
-.btn-info {
-    background: #1d8cf8;
-    border: none;
-}
-
-    .btn-info:hover {
-        background: #1a7bd9;
-    }
-
-.btn-warning {
-    background: #f0ad4e;
-    border: none;
-    color: #fff;
-}
-
-    .btn-warning:hover {
-        background: #e29a3c;
-    }
-
-.btn-success {
-    background: #28a745;
-    border: none;
-}
-
-    .btn-success:hover {
-        background: #218838;
-    }
-
-.fade-in {
-    animation: fadeIn 0.35s ease-in-out;
-}
-
-.fade-out {
-    animation: fadeOut 0.35s forwards ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
+/* Nice smooth transitions */
+* {
+    transition: 0.15s ease;
 }

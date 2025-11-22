@@ -53,13 +53,13 @@ namespace Hotel.Web.Areas.User.Pages.Hotels
             else
                 Cities = new List<CityDTO>();
 
-            Result = await _hotelService.SearchHotelsAsync(
-               SearchName,
-               CountryId,
-               CityId,
-               Page,
-               pageSize: 6
-           );
+           // Result = await _hotelService.SearchHotelsAsync(
+           //    SearchName,
+           //    CountryId,
+           //    CityId,
+           //    Page,
+           //    pageSize: 6
+           //);
         }
 
         public async Task<JsonResult> OnGetCities(Guid countryId)

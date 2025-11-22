@@ -1,24 +1,23 @@
 ﻿@page
-@model Hotel.Web.Areas.Admin.Pages.Hotel.IndexModel
+@model Hotel.Web.Areas.Admin.Pages.Hotels.IndexModel
 @{
     ViewData["Title"] = "Hotels";
 }
+
 <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-<link rel="stylesheet" href="~/css/admin/hotels/hotels.css" asp-append-version="true" />
+<link href="~/css/admin/hotels/hotels.css" rel="stylesheet" asp-append-version="true" />
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>Hotels</h2>
 
-    <form method="get" class="d-flex align-items-center" id="searchForm">
-        <input name="Search" value="@Model.Search" class="form-control me-2" placeholder="Search hotels or city..." />
+    <form id="filters" class="d-flex align-items-center" onsubmit="return false;">
+        <input id="qName" name="Search" value="@Model.Search" class="form-control me-2" placeholder="Search hotels..." />
 
         <select id="countryFilter" name="CountryId" class="form-select me-2" style="width:180px;">
             <option value="">All countries</option>
             @foreach (var c in Model.Countries)
             {
-                <option value="@c.Id" selected="@(Model.CountryId == c.Id)">
-                    @c.Name
-                </option>
+                <option value="@c.Id" selected="@(Model.CountryId == c.Id ? "selected" : null)">@c.Name</option>
             }
         </select>
 
@@ -26,36 +25,31 @@
             <option value="">All cities</option>
             @foreach (var ct in Model.CitiesForSelectedCountry)
             {
-                <option value="@ct.Id" selected="@(Model.CityId == ct.Id)">
-                    @ct.Name
-                </option>
+                <option value="@ct.Id" selected="@(Model.CityId == ct.Id ? "selected" : null)">@ct.Name</option>
             }
         </select>
 
-        <button class="btn btn-primary me-2">Search</button>
-        <a class="btn btn-success" id="btnAdd" href="#" data-bs-toggle="modal" data-bs-target="#hotelModal">Add New</a>
+        <button id="btnSearch" class="btn btn-primary me-2">Search</button>
+        <button id="btnAdd" class="btn btn-success">Add New</button>
     </form>
 </div>
 
-
-<!-- Cards -->
-<div class="row" id="hotelsList">
-    @if (Model.Paged.Items.Any())
-    {
-        foreach (var hotel in Model.Paged.Items)
+<div id="hotelsContainer">
+    <div class="row" id="hotelsList">
+        @foreach (var hotel in Model.Paged.Items)
         {
-            <div class="col-md-3 mb-4 hotel-card fade-in" id="hotel_@hotel.Id">
+            <div class="col-md-4 mb-4 hotel-card" id="hotel_@hotel.Id">
                 <div class="card h-100">
-                    <img src="~/images/hotels/placeholder.jpg" class="card-img-top" alt="Hotel image" />
-
+                    <img src="/images/hotels/placeholder.jpg" class="card-img-top" style="height:180px; object-fit:cover;">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">@hotel.Name</h5>
-                        <p class="card-text text-muted">@hotel.CityName</p>
-                        <p class="mb-2">Rating: @hotel.Rating.ToString("0.0")</p>
+                        <h5>@hotel.Name</h5>
+                        <p class="text-muted">@hotel.CityName (@hotel.CountryName)</p>
+                        <p><strong>Email:</strong> @hotel.Email</p>
+                        <p><strong>Phone:</strong> @hotel.PhoneNumber</p>
                         <p class="small text-truncate">@hotel.Description</p>
 
-                        <div class="mt-auto">
-                            <a class="btn btn-sm btn-info" asp-area="Admin" asp-page="/Hotels/Details" asp-route-id="@hotel.Id">Details</a>
+                        <div class="mt-auto d-flex gap-2">
+                            <button class="btn btn-sm btn-info btn-details" data-id="@hotel.Id">Details</button>
                             <button class="btn btn-sm btn-warning btn-edit" data-id="@hotel.Id">Edit</button>
                             <button class="btn btn-sm btn-danger btn-delete" data-id="@hotel.Id">Delete</button>
                         </div>
@@ -63,296 +57,210 @@
                 </div>
             </div>
         }
-    }
-    else
-    {
-        <div class="col-12">
-            <div class="alert alert-info">No hotels found.</div>
-        </div>
-    }
-</div>
+    </div>
 
-
-<!-- Pagination -->
-@if (Model.Paged.TotalPages > 1)
-{
     <nav>
-        <ul class="pagination">
-            <li class="page-item @(Model.Paged.Page == 1 ? "disabled" : "")">
-                <a class="page-link"
-                   asp-route-Page="@(Model.Paged.Page - 1)"
-                   asp-route-Search="@Model.Search"
-                   asp-route-CountryId="@Model.CountryId"
-                   asp-route-CityId="@Model.CityId">Previous</a>
-            </li>
-
-            @for (int i = 1; i <= Model.Paged.TotalPages; i++)
+        <ul class="pagination" id="pager">
+            @if (Model.Paged.TotalPages > 1)
             {
-                <li class="page-item @(i == Model.Paged.Page ? "active" : "")">
-                    <a class="page-link"
-                       asp-route-Page="@i"
-                       asp-route-Search="@Model.Search"
-                       asp-route-CountryId="@Model.CountryId"
-                       asp-route-CityId="@Model.CityId">@i</a>
+                <li class="page-item @(Model.Paged.Page == 1 ? "disabled" : "")">
+                    <a class="page-link" data-page="@(Model.Paged.Page - 1)">Previous</a>
+                </li>
+
+                @for (int i = 1; i <= Model.Paged.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.Paged.Page ? "active" : "")">
+                        <a class="page-link" data-page="@i">@i</a>
+                    </li>
+                }
+
+                <li class="page-item @(Model.Paged.Page == Model.Paged.TotalPages ? "disabled" : "")">
+                    <a class="page-link" data-page="@(Model.Paged.Page + 1)">Next</a>
                 </li>
             }
-
-            <li class="page-item @(Model.Paged.Page == Model.Paged.TotalPages ? "disabled" : "")">
-                <a class="page-link"
-                   asp-route-Page="@(Model.Paged.Page + 1)"
-                   asp-route-Search="@Model.Search"
-                   asp-route-CountryId="@Model.CountryId"
-                   asp-route-CityId="@Model.CityId">Next</a>
-            </li>
         </ul>
     </nav>
-}
-
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="hotelModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <form id="hotelForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="hotelModalLabel">Add Hotel</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-
-                <div class="modal-body">
-                    <input type="hidden" id="Input_Id" name="Id" />
-
-                    <div class="mb-3">
-                        <label class="form-label">Name</label>
-                        <input id="Input_Name" name="Name" class="form-control" required />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Location</label>
-                        <input id="Input_Location" name="Location" class="form-control" required />
-                    </div>
-
-                    <div class="mb-3 d-flex">
-                        <div style="flex:1; margin-right:8px;">
-                            <label class="form-label">Country</label>
-                            <select id="Input_CountryId" class="form-select" required>
-                                <option value="">Choose country</option>
-                                @foreach (var c in Model.Countries)
-                                {
-                                    <option value="@c.Id">@c.Name</option>
-                                }
-                            </select>
-                        </div>
-
-                        <div style="flex:1;">
-                            <label class="form-label">City</label>
-                            <select id="Input_CityId" name="CityId" class="form-select" required>
-                                <option value="">Choose city</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Rating</label>
-                        <input id="Input_Rating" name="Rating" type="number" min="0" max="5" step="0.1" class="form-control" />
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Description</label>
-                        <textarea id="Input_Description" name="Description" class="form-control"></textarea>
-                    </div>
-
-                    <div id="modalErrors" class="text-danger"></div>
-                </div>
-
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button id="modalSave" class="btn btn-primary">Save</button>
-                </div>
-            </form>
-        </div>
+        <div class="modal-content" id="hotelModalContent"></div>
     </div>
 </div>
-
-
 
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 
-    /* ---------------------- Helper ---------------------- */
-    async function getJson(url) {
-        const res = await fetch(url);
-        return res.json();
+    const modalEl = document.getElementById("hotelModal");
+    let modalInstance = new bootstrap.Modal(modalEl);
+
+    const getToken = () => document.querySelector('input[name="__RequestVerificationToken"]')?.value ?? '';
+
+    async function fetchJson(url, opts = {}) {
+        const r = await fetch(url, { credentials: "same-origin", ...opts });
+        const txt = await r.text();
+        try { return JSON.parse(txt); } catch { return txt; }
     }
 
-    /* ---------------------- Load Cities (Filter) ---------------------- */
-    document.getElementById('countryFilter').addEventListener('change', async function () {
-        const id = this.value;
-        const citySel = document.getElementById('cityFilter');
-
-        citySel.innerHTML = '<option value="">Loading...</option>';
-
-        if (!id) {
-            citySel.innerHTML = '<option value="">All cities</option>';
-            return;
-        }
-
-        const cities = await getJson(`?handler=Cities&countryId=${id}`);
-
-        citySel.innerHTML = '<option value="">All cities</option>';
-        cities.forEach(c => {
-            citySel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-        });
+    // =============== Load Cities Filter ===============
+    document.getElementById("countryFilter").addEventListener("change", async function () {
+        const cid = this.value;
+        const citySel = document.getElementById("cityFilter");
+        citySel.innerHTML = `<option>Loading...</option>`;
+        const list = await fetchJson(`?handler=Cities&countryId=${cid}`);
+        citySel.innerHTML = `<option value="">All cities</option>`;
+        list.forEach(c => citySel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
     });
 
-    /* ---------------------- Load Cities (Modal) ---------------------- */
-    document.getElementById('Input_CountryId').addEventListener('change', async function () {
-        const id = this.value;
-        const citySel = document.getElementById('Input_CityId');
+    // ======= Load cities inside modal (Create/Edit) =======
+    async function loadCitiesInsideModal(countryId, selector) {
+        const sel = document.querySelector(selector);
+        sel.innerHTML = `<option>Loading...</option>`;
+        const list = await fetchJson(`?handler=Cities&countryId=${countryId}`);
+        sel.innerHTML = `<option value="">Choose city</option>`;
+        list.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.name}</option>`);
+    }
 
-        citySel.innerHTML = '<option value="">Loading...</option>';
-
-        if (!id) {
-            citySel.innerHTML = '<option value="">Choose city</option>';
-            return;
-        }
-
-        const cities = await getJson(`?handler=Cities&countryId=${id}`);
-
-        citySel.innerHTML = '<option value="">Choose city</option>';
-        cities.forEach(c => {
-            citySel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-        });
-    });
-
-    /* ---------------------- Make Hotel Card ---------------------- */
-    function hotelCard(h) {
+    // =============== Create Hotel Card ===============
+    function createCard(h) {
+        const id = h.id ?? h.Id;
         return `
-        <div class="col-md-3 mb-4 hotel-card fade-in" id="hotel_${h.id}">
-            <div class="card h-100">
-                <img src="~/images/hotels/placeholder.jpg" class="card-img-top" />
+            <div class="col-md-4 mb-4 hotel-card" id="hotel_${id}">
+                <div class="card h-100">
+                    <img src="/images/hotels/placeholder.jpg" class="card-img-top" style="height:180px;object-fit:cover">
+                    <div class="card-body d-flex flex-column">
+                        <h5>${h.name}</h5>
+                        <p class="text-muted">${h.cityName} (${h.countryName})</p>
+                        <p><strong>Email:</strong> ${h.email ?? ""}</p>
+                        <p><strong>Phone:</strong> ${h.phoneNumber ?? ""}</p>
+                        <p class="small text-truncate">${h.description ?? ""}</p>
 
-                <div class="card-body d-flex flex-column">
-                    <h5 class="card-title">${h.name}</h5>
-                    <p class="card-text text-muted">${h.cityName}</p>
-                    <p class="mb-2">Rating: ${h.rating.toFixed(1)}</p>
-                    <p class="small text-truncate">${h.description ?? ""}</p>
-
-                    <div class="mt-auto">
-                        <a class="btn btn-sm btn-info" href="/Admin/Hotels/Details?id=${h.id}">Details</a>
-                        <button class="btn btn-sm btn-warning btn-edit" data-id="${h.id}">Edit</button>
-                        <button class="btn btn-sm btn-danger btn-delete" data-id="${h.id}">Delete</button>
+                        <div class="mt-auto d-flex gap-2">
+                            <button class="btn btn-sm btn-info btn-details" data-id="${id}">Details</button>
+                            <button class="btn btn-sm btn-warning btn-edit" data-id="${id}">Edit</button>
+                            <button class="btn btn-sm btn-danger btn-delete" data-id="${id}">Delete</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>`;
+            </div>`;
     }
 
-    /* ---------------------- Add Card ---------------------- */
-    function addHotel(h) {
-        document.getElementById("hotelsList").insertAdjacentHTML("afterbegin", hotelCard(h));
-        bindButtons();
-    }
+    // =============== Attach Events To Cards ===============
+    function attachCardEvents() {
 
-    /* ---------------------- Update Card ---------------------- */
-    function updateHotel(h) {
-        const card = document.getElementById(`hotel_${h.id}`);
-        if (card) {
-            card.outerHTML = hotelCard(h);
-            bindButtons();
-        }
-    }
-
-    /* ---------------------- Remove Card ---------------------- */
-    function removeHotel(id) {
-        const card = document.getElementById(`hotel_${id}`);
-        if (!card) return;
-
-        card.classList.add("fade-out");
-        setTimeout(() => card.remove(), 300);
-    }
-
-    /* ---------------------- Bind Edit/Delete ---------------------- */
-    function bindButtons() {
-        /* EDIT */
+        // EDIT
         document.querySelectorAll(".btn-edit").forEach(btn => {
             btn.onclick = async () => {
-                const id = btn.dataset.id;
-                const h = await getJson(`?handler=Hotel&id=${id}`);
-
-                document.getElementById("Input_Id").value = h.id;
-                document.getElementById("Input_Name").value = h.name;
-                document.getElementById("Input_Location").value = h.location;
-                document.getElementById("Input_Rating").value = h.rating;
-                document.getElementById("Input_Description").value = h.description;
-
-                // Pre-select country
-                document.getElementById("Input_CountryId").value = h.countryId;
-
-                // Load cities and select correct one
-                const cities = await getJson(`?handler=Cities&countryId=${h.countryId}`);
-                const citySel = document.getElementById("Input_CityId");
-                citySel.innerHTML = '<option value="">Choose city</option>';
-                cities.forEach(c => {
-                    citySel.innerHTML += `<option value="${c.id}">${c.name}</option>`;
-                });
-
-                citySel.value = h.cityId;
-
-                document.getElementById("modalErrors").innerText = "";
-                document.getElementById("hotelModalLabel").innerText = "Edit Hotel";
-
-                new bootstrap.Modal(document.getElementById('hotelModal')).show();
+                const html = await fetchJson(`?handler=EditPartial&id=${btn.dataset.id}`);
+                document.getElementById("hotelModalContent").innerHTML = html;
+                modalInstance.show();
+                bindModalForm();
             };
         });
 
-        /* DELETE */
+        // DETAILS
+        document.querySelectorAll(".btn-details").forEach(btn => {
+            btn.onclick = async () => {
+                const html = await fetchJson(`?handler=DetailsPartial&id=${btn.dataset.id}`);
+                document.getElementById("hotelModalContent").innerHTML = html;
+                modalInstance.show();
+            };
+        });
+
+        // DELETE
         document.querySelectorAll(".btn-delete").forEach(btn => {
             btn.onclick = async () => {
                 if (!confirm("Delete this hotel?")) return;
 
-                const id = btn.dataset.id;
-                const res = await fetch(`?handler=DeleteAjax&id=${id}`, { method: "POST" });
-                const data = await res.json();
+                const fd = new FormData();
+                fd.append("id", btn.dataset.id);
+                fd.append("__RequestVerificationToken", getToken());
 
-                if (data.success) removeHotel(id);
+                const res = await fetchJson(`?handler=DeleteAjax`, { method: "POST", body: fd });
+
+                if (res.success) {
+                    document.getElementById(`hotel_${btn.dataset.id}`).remove();
+                }
             };
         });
     }
 
-    bindButtons();
+    attachCardEvents();
 
+    // =============== Bind Modal Create/Edit form ===============
+    function bindModalForm() {
+        const form = document.querySelector("#hotelModalContent form");
+        if (!form) return;
 
-    /* ---------------------- Submit Modal ---------------------- */
-    document.getElementById("hotelForm").addEventListener("submit", async (e) => {
-        e.preventDefault();
+        const c = form.querySelector('[name="CountryId"]');
+        const ct = form.querySelector('[name="CityId"]');
 
-        const id = document.getElementById("Input_Id").value;
-        const form = new FormData(e.target);
-        const handler = id ? "EditAjax" : "CreateAjax";
-
-        const res = await fetch(`?handler=${handler}`, {
-            method: "POST",
-            body: form
-        });
-
-        const data = await res.json();
-
-        if (!data.success) {
-            document.getElementById("modalErrors").innerText =
-                (data.errors || ["Server error"]).join("\n");
-            return;
+        if (c && ct) {
+            c.addEventListener("change", () =>
+                loadCitiesInsideModal(c.value, '[name="CityId"]'));
         }
 
-        const hotel = data.hotel;
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        if (id)
-            updateHotel(hotel);
-        else
-            addHotel(hotel);
+            const fd = new FormData(form);
+            fd.append("__RequestVerificationToken", getToken());
 
-        bootstrap.Modal.getInstance(document.getElementById("hotelModal")).hide();
+            const handler = form.dataset.handler;
+
+            const res = await fetchJson(`?handler=${handler}`, { method: "POST", body: fd });
+
+            if (!res.success) {
+                form.querySelector(".modal-errors").innerHTML =
+                    (res.errors || ["Form error"]).join("<br>");
+                return;
+            }
+
+            const h = res.hotel;
+
+            if (handler === "CreateAjax") {
+                hotelsList.insertAdjacentHTML("afterbegin", createCard(h));
+            } else {
+                document.getElementById(`hotel_${h.id}`).outerHTML = createCard(h);
+            }
+
+            attachCardEvents();
+            modalInstance.hide();
+        });
+    }
+
+    // =============== Search + Pagination ===============
+    async function loadHotelsAjax(page) {
+
+        const res = await fetchJson(`?handler=SearchAjax&Search=${qName.value}&CountryId=${countryFilter.value}&CityId=${cityFilter.value}&Page=${page}`);
+
+        hotelsList.innerHTML = "";
+        res.items.forEach(h => hotelsList.insertAdjacentHTML("beforeend", createCard(h)));
+
+        attachCardEvents();
+
+        // Update cities after search
+        if (countryFilter.value) {
+            await loadCitiesInsideModal(countryFilter.value, "#cityFilter");
+            document.getElementById("cityFilter").value = cityFilter.value;
+        }
+    }
+
+    document.getElementById("btnSearch").onclick = () => loadHotelsAjax(1);
+
+    document.getElementById("pager")?.addEventListener("click", e => {
+        const a = e.target.closest("a[data-page]");
+        if (a) loadHotelsAjax(parseInt(a.dataset.page));
     });
+
+    // =============== Create button ===============
+    document.getElementById("btnAdd").onclick = async () => {
+        const html = await fetchJson(`?handler=CreatePartial`);
+        document.getElementById("hotelModalContent").innerHTML = html;
+        modalInstance.show();
+        bindModalForm();
+    };
 
 </script>

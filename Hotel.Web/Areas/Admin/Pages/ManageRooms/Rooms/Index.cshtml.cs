@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Hotel.Application.Interfaces.Services.Profile;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms
 {
+    [Authorize]
+
     [ValidateAntiForgeryToken]
     public class IndexModel : PageModel
     {

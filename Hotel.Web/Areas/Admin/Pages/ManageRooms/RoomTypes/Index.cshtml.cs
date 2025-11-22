@@ -1,10 +1,12 @@
 using Hotel.Application.DTOs.RoomDto.RoomTypeDTO;
 using Hotel.Application.Interfaces.Services.Profile;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.RoomTypes
 {
+    [Authorize]
     [IgnoreAntiforgeryToken]
     public class IndexModel : PageModel
     {

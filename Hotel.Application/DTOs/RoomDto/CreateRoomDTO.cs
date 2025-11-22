@@ -15,7 +15,7 @@ namespace Hotel.Application.DTOs.RoomDto
         public string RoomNumber { get; set; }
 
         [Required]
-        public RoomType RoomType { get; set; }
+        public Guid RoomType { get; set; }
 
         [Range(1, 10000)]
         public decimal Price { get; set; }

@@ -21,8 +21,8 @@
         @foreach (var c in Model.Countries)
         {
             <option value="@c.Id" selected="@(Model.CountryId == c.Id ? "selected" : null)">
-    @c.Name
-</option>
+                @c.Name
+            </option>
         }
     </select>
 </div>

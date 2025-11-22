@@ -1,11 +1,14 @@
 using Hotel.Application.DTOs.Locations.Country;
 using Hotel.Application.Interfaces.Services;
 using Hotel.Application.Interfaces.Services.Profile;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Locations
 {
+    [Authorize]
+
     [IgnoreAntiforgeryToken]
     public class CountriesModel : PageModel
     {

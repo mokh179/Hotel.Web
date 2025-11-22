@@ -20,9 +20,9 @@ namespace Hotel.Entities.Entities
         public Guid CityId { get; set; }
         public City City { get; set; }
 
-        public string Description { get; set; }
-        public string PhoneNumber { get; set; }
-        public string Email { get; set; }
+        public string? Description { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
         public double Rating { get; set; }
         public ICollection<Room> Rooms { get; set; } = new List<Room>();
     }

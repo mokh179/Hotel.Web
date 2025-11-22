@@ -1,0 +1,18 @@
+﻿@model Hotel.Application.DTOs.HotelDto.HotelDTO
+
+<div class="modal-header">
+    <h5 class="modal-title">@Model.Name</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+<div class="modal-body">
+    <p><strong>Location:</strong> @Model.CityName (@Model.CountryName)</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p><strong>Phone:</strong> @Model.PhoneNumber</p>
+    <p><strong>Rooms:</strong> @Model.RoomCount</p>
+    <p><strong>Rating:</strong> @Model.Rating</p>
+    <hr />
+    <p>@Model.Description</p>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>
