@@ -80,7 +80,8 @@ namespace Hotel.Application.Mapping
             #endregion
 
             #region City
-            CreateMap<City, CityDTO>();
+            CreateMap<City, CityDTO>().ForMember(dest => dest.CountryName,
+                                                    opt => opt.MapFrom(src => src.Country.Name));
             CreateMap<CreateCityDTO, City>();
             CreateMap<UpdateCityDTO, City>();
             #endregion

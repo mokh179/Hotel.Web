@@ -58,8 +58,13 @@ namespace Hotel.Infrastructure.Services
             if (_cache.TryGetValue(key, out CityDTO? cached))
                 return cached;
 
-            var entity = await _uow.Cities.GetByIdAsync(id);
-            if (entity == null) return null;
+                var entity = await _uow.Cities
+           .Query()
+           .Include(c => c.Country)
+           .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (entity == null)
+                return null;
 
             var dto = _mapper.Map<CityDTO>(entity);
 
