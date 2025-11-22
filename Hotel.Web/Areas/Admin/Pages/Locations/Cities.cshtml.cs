@@ -1,3 +1,4 @@
+using AutoMapper;
 using Hotel.Application.DTOs.Locations.City;
 using Hotel.Application.DTOs.Locations.Country;
 using Hotel.Application.Interfaces.Services;
@@ -6,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Locations
 {
+    [IgnoreAntiforgeryToken]
     public class CitiesModel : PageModel
     {
         private readonly ICityService _cityService;
         private readonly ICountryService _countryService;
+
         public CitiesModel(ICityService cityService, ICountryService countryService)
         {
             _cityService = cityService;
@@ -18,58 +21,62 @@ namespace Hotel.Web.Areas.Admin.Pages.Locations
 
         public List<CityDTO> Cities { get; set; } = new();
         public List<CountryDTO> Countries { get; set; } = new();
-
-        [BindProperty(SupportsGet = true)]
         public Guid? CountryId { get; set; }
-        public async Task OnGetAsync()
+
+        public async Task OnGetAsync(Guid? countryId)
         {
+            CountryId = countryId;
+
             Countries = await _countryService.GetAllAsync();
-            Cities = CountryId.HasValue
-                ? await _cityService.GetByCountryAsync(CountryId.Value)
+
+            Cities = countryId.HasValue
+                ? await _cityService.GetByCountryAsync(countryId.Value)
                 : await _cityService.GetAllAsync();
         }
 
+        // -------- GET ONE --------
         public async Task<JsonResult> OnGetCityAsync(Guid id)
         {
             var city = await _cityService.GetByIdAsync(id);
             return new JsonResult(city);
         }
 
-        public async Task<JsonResult> OnPostCreateAjaxAsync([FromForm] CreateCityDTO input)
+        // -------- CREATE --------
+        public async Task<JsonResult> OnPostCreateAjaxAsync([FromForm] CreateCityDTO dto)
         {
             if (!ModelState.IsValid)
-                return new JsonResult(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                return new JsonResult(new
+                {
+                    success = false,
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
 
-            try
-            {
-                var created = await _cityService.CreateAsync(input);
-                return new JsonResult(new { success = true, city = created });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, errors = new[] { ex.Message } });
-            }
+            var created = await _cityService.CreateAsync(dto);
+
+            // reload to get CountryName
+            created = await _cityService.GetByIdAsync(created.Id);
+
+            return new JsonResult(new { success = true, city = created });
         }
 
-        public async Task<JsonResult> OnPostEditAjaxAsync([FromForm] UpdateCityDTO input)
+        // -------- EDIT --------
+        public async Task<JsonResult> OnPostEditAjaxAsync([FromForm] UpdateCityDTO dto)
         {
             if (!ModelState.IsValid)
-                return new JsonResult(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                return new JsonResult(new
+                {
+                    success = false,
+                    errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage)
+                });
 
-            try
-            {
-                var updated = await _cityService.UpdateAsync(input);
-                if (updated == null)
-                    return new JsonResult(new { success = false, errors = new[] { "City not found" } });
+            var updated = await _cityService.UpdateAsync(dto);
 
-                return new JsonResult(new { success = true, city = updated });
-            }
-            catch (Exception ex)
-            {
-                return new JsonResult(new { success = false, errors = new[] { ex.Message } });
-            }
+            updated = await _cityService.GetByIdAsync(updated.Id);
+
+            return new JsonResult(new { success = true, city = updated });
         }
 
+        // -------- DELETE --------
         public async Task<JsonResult> OnPostDeleteAjaxAsync(Guid id)
         {
             var ok = await _cityService.DeleteAsync(id);

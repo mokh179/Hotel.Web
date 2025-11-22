@@ -14,12 +14,12 @@ namespace Hotel.Application.Interfaces.Services
         Task<List<HotelDTO>> GetAllAsync();
         Task<HotelDTO> CreateAsync(CreateHotelDTO dto);
         Task<HotelDTO> UpdateAsync(UpdateHotelDTO dto);
-        Task DeleteAsync(Guid id);
+        Task<bool> DeleteAsync(Guid id);
 
         // Bulk operations
         Task AddRangeAsync(IEnumerable<CreateHotelDTO> dtos);
         Task SoftDeleteRangeAsync(IEnumerable<Guid> ids);
-
+        Task<List<HotelDTO>> GetAllCachedAsync();
         Task<PagedResult<HotelDTO>> SearchHotelsAsync(
                                                         string name,
                                                         Guid? countryId,

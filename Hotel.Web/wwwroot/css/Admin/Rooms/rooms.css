@@ -1,0 +1,38 @@
+﻿/* Rooms page */
+.room-card {
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+    .room-card .card-body {
+        padding: 16px;
+    }
+
+#roomsContainer .card-img-top {
+    height: 160px;
+    object-fit: cover;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+/* Filters card */
+.card .form-label.small {
+    font-size: .85rem;
+}
+
+/* Empty */
+.alert-info {
+    background: #eef6ff;
+    color: #0b5ed7;
+}
+
+/* Modal */
+.modal-header {
+    background: #1e1e2d;
+    color: white;
+    border-bottom: none;
+}

@@ -1,0 +1,384 @@
+﻿@page
+@model Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms.IndexModel
+@{
+    ViewData["Title"] = "Rooms";
+}
+
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link href="~/css/admin/rooms/rooms.css" rel="stylesheet" asp-append-version="true" />
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Rooms</h2>
+
+        <button class="btn btn-success btnAdd" data-bs-toggle="modal" data-bs-target="#roomModal">
+            Add Room
+        </button>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-3 p-3">
+        <form id="filtersForm" class="row g-2 align-items-end">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="__RequestVerificationToken" name="__RequestVerificationToken" />
+
+            <div class="col-md-3">
+                <label class="form-label small">Hotel</label>
+                <select id="filterHotel" class="form-select">
+                    <option value="">All hotels</option>
+                    @foreach (var h in Model.Hotels)
+                    {
+                        <option value="@h.Id">@h.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <label class="form-label small">Room Type</label>
+                <select id="filterRoomType" class="form-select">
+                    <option value="">All types</option>
+                    @foreach (var rt in Model.RoomTypes)
+                    {
+                        <option value="@rt.Id">@rt.Name</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small">Number</label>
+                <input id="filterNumber" class="form-control" placeholder="Room number" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small">Price Min</label>
+                <input id="priceMin" type="number" class="form-control" min="0" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small">Price Max</label>
+                <input id="priceMax" type="number" class="form-control" min="0" />
+            </div>
+
+            <div class="col-md-2">
+                <label class="form-label small">Availability</label>
+                <select id="filterAvailability" class="form-select">
+                    <option value="">Any</option>
+                    <option value="available">Available</option>
+                    <option value="booked">Booked</option>
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button id="btnSearch" class="btn btn-primary w-100">Search</button>
+            </div>
+
+            <div class="col-md-2">
+                <button id="btnClear" type="button" class="btn btn-outline-secondary w-100">Clear</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Cards -->
+    <div id="roomsContainer" class="row g-3">
+        <!-- rendered by JS -->
+    </div>
+
+    <!-- Pagination -->
+    <nav aria-label="Rooms pagination" class="mt-4">
+        <ul id="pagination" class="pagination justify-content-center"></ul>
+    </nav>
+</div>
+
+<!-- Modal (create/edit) -->
+<div class="modal fade" id="roomModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="roomForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="roomModalLabel">Add / Edit Room</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" id="Input_Id" name="Id" />
+
+                    <div class="row g-2">
+                        <div class="col-md-6">
+                            <label class="form-label">Hotel</label>
+                            <select id="Input_HotelId" name="HotelId" class="form-select" required>
+                                <option value="">Choose hotel</option>
+                                @foreach (var h in Model.Hotels)
+                                {
+                                    <option value="@h.Id">@h.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Room Type</label>
+                            <select id="Input_RoomTypeId" name="RoomTypeId" class="form-select" required>
+                                <option value="">Choose room type</option>
+                                @foreach (var rt in Model.RoomTypes)
+                                {
+                                    <option value="@rt.Id">@rt.Name</option>
+                                }
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Number</label>
+                            <input id="Input_Number" name="Number" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Price</label>
+                            <input id="Input_Price" name="Price" type="number" step="0.01" min="0" class="form-control" required />
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">Is Available</label>
+                            <select id="Input_IsAvailable" name="IsAvailable" class="form-select">
+                                <option value="true">Yes</option>
+                                <option value="false">No</option>
+                            </select>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Notes / Description</label>
+                            <textarea id="Input_Description" name="Description" class="form-control"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="modalErrors" class="text-danger mt-2"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button id="modalSave" type="submit" class="btn btn-primary">Save</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ======= Helpers ======= */
+async function fetchJson(url, opts) {
+    const res = await fetch(url, opts);
+    const text = await res.text();
+    try { return JSON.parse(text); }
+    catch { console.error('Invalid server response:', text); throw new Error('Invalid server response'); }
+}
+
+function normalizeRoomDto(r) {
+    return {
+        id: r.id ?? r.Id,
+        number: r.number ?? r.Number,
+        price: r.price ?? r.Price,
+        hotelId: r.hotelId ?? r.HotelId ?? r.Hotel?.id ?? r.Hotel?.Id,
+        hotelName: r.hotelName ?? r.HotelName ?? r.Hotel?.name ?? r.Hotel?.Name,
+        roomTypeId: r.roomTypeId ?? r.RoomTypeId ?? r.RoomType?.id ?? r.RoomType?.Id,
+        roomTypeName: r.roomTypeName ?? r.RoomTypeName ?? r.RoomType?.name ?? r.RoomType?.Name,
+        isAvailable: typeof (r.isAvailable) !== 'undefined' ? r.isAvailable : (typeof (r.IsAvailable) !== 'undefined' ? r.IsAvailable : true),
+        description: r.description ?? r.Description
+    };
+}
+
+/* ======= Rendering ======= */
+function cardHtml(room) {
+    const availBadge = room.isAvailable ? `<span class="badge bg-success">Available</span>` : `<span class="badge bg-danger">Booked</span>`;
+    return `
+    <div class="col-md-4" id="room_${room.id}">
+        <div class="card h-100 room-card">
+            <img src="~/images/hotels/placeholder.jpg" class="card-img-top" style="height:160px; object-fit:cover" alt="room image" />
+            <div class="card-body d-flex flex-column">
+                <h5 class="card-title">${room.hotelName ?? ''} — ${room.roomTypeName ?? ''}</h5>
+                <p class="mb-1 text-muted">Room: ${room.number}</p>
+                <p class="mb-1">Price: ${parseFloat(room.price).toFixed(2)}</p>
+                <p class="mb-2 small text-truncate">${room.description ?? ''}</p>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                    <div>${availBadge}</div>
+                    <div>
+                        <button class="btn btn-sm btn-info btn-details" data-id="${room.id}">Details</button>
+                        <button class="btn btn-sm btn-warning btn-edit" data-id="${room.id}">Edit</button>
+                        <button class="btn btn-sm btn-danger btn-delete" data-id="${room.id}">Delete</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `;
+}
+
+/* Render list and pagination */
+function renderRooms(items) {
+    const container = document.getElementById('roomsContainer');
+    container.innerHTML = '';
+    if (!items || items.length === 0) {
+        container.innerHTML = `<div class="col-12"><div class="alert alert-info">No rooms found.</div></div>`;
+        return;
+    }
+    items.forEach(i => {
+        const r = normalizeRoomDto(i);
+        container.insertAdjacentHTML('beforeend', cardHtml(r));
+    });
+    bindRoomEvents();
+}
+
+function renderPagination(page, totalPages) {
+    const ul = document.getElementById('pagination');
+    ul.innerHTML = '';
+    if (totalPages <= 1) return;
+    const makeItem = (p, text, active, disabled) =>
+        `<li class="page-item ${active ? 'active' : ''} ${disabled ? 'disabled' : ''}"><a class="page-link" href="#" data-page="${p}">${text}</a></li>`;
+
+    ul.insertAdjacentHTML('beforeend', makeItem(page - 1, 'Previous', false, page === 1));
+    for (let i = 1; i <= totalPages; i++) {
+        ul.insertAdjacentHTML('beforeend', makeItem(i, i, i === page, false));
+    }
+    ul.insertAdjacentHTML('beforeend', makeItem(page + 1, 'Next', false, page === totalPages));
+    ul.querySelectorAll('a.page-link').forEach(a => a.addEventListener('click', e => {
+        e.preventDefault();
+        const p = parseInt(a.dataset.page);
+        if (!isNaN(p)) loadRooms(p);
+    }));
+}
+
+/* ======= State & load ======= */
+let currentPage = 1;
+const PAGE_SIZE = 9;
+
+async function getFilters() {
+    return {
+        hotelId: document.getElementById('filterHotel').value || null,
+        roomTypeId: document.getElementById('filterRoomType').value || null,
+        number: document.getElementById('filterNumber').value || null,
+        priceMin: document.getElementById('priceMin').value || null,
+        priceMax: document.getElementById('priceMax').value || null,
+        availability: document.getElementById('filterAvailability').value || null
+    };
+}
+
+async function loadRooms(page = 1) {
+    currentPage = page;
+    const f = await getFilters();
+    const qs = new URLSearchParams({
+        page,
+        pageSize: PAGE_SIZE,
+        hotelId: f.hotelId || '',
+        roomTypeId: f.roomTypeId || '',
+        number: f.number || '',
+        priceMin: f.priceMin || '',
+        priceMax: f.priceMax || '',
+        availability: f.availability || ''
+    });
+
+    const data = await fetchJson(`?handler=SearchAjax&${qs.toString()}`);
+    renderRooms(data.items || []);
+    renderPagination(data.page || 1, data.totalPages || 1);
+}
+
+/* ======= Events (bind after render) ======= */
+function bindRoomEvents() {
+    // Edit
+    document.querySelectorAll('.btn-edit').forEach(btn => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
+            const dto = await fetchJson(`?handler=Room&id=${id}`);
+            const r = normalizeRoomDto(dto);
+            document.getElementById('Input_Id').value = r.id;
+            document.getElementById('Input_HotelId').value = r.hotelId || '';
+            document.getElementById('Input_RoomTypeId').value = r.roomTypeId || '';
+            document.getElementById('Input_Number').value = r.number || '';
+            document.getElementById('Input_Price').value = r.price || '';
+            document.getElementById('Input_IsAvailable').value = (r.isAvailable ? 'true' : 'false');
+            document.getElementById('Input_Description').value = r.description || '';
+            document.getElementById('modalErrors').innerHTML = '';
+            document.getElementById('roomModalLabel').innerText = 'Edit Room';
+            new bootstrap.Modal(document.getElementById('roomModal')).show();
+        };
+    });
+
+    // Delete
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.onclick = async () => {
+            const id = btn.dataset.id;
+            if (!confirm('Delete this room?')) return;
+
+            const fd = new FormData();
+            fd.append('Id', id);
+            const token = document.getElementById('__RequestVerificationToken')?.value;
+            if (token) fd.append('__RequestVerificationToken', token);
+
+            const res = await fetch(`?handler=DeleteAjax`, { method: 'POST', body: fd });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('room_' + id)?.remove();
+            } else {
+                alert('Delete failed: ' + (data.errors ? data.errors.join(', ') : 'unknown'));
+            }
+        };
+    });
+
+    // Details
+    document.querySelectorAll('.btn-details').forEach(btn => {
+        btn.onclick = () => {
+            const id = btn.dataset.id;
+            window.location.href = `/Admin/Rooms/Details?id=${id}`;
+        };
+    });
+}
+
+/* ======= page actions ======= */
+document.getElementById('btnSearch').addEventListener('click', async (e) => {
+    e.preventDefault();
+    loadRooms(1);
+});
+document.getElementById('btnClear').addEventListener('click', async () => {
+    document.getElementById('filtersForm').reset();
+    loadRooms(1);
+});
+
+/* Create / Edit submit */
+document.getElementById('roomForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('Input_Id').value;
+    const fd = new FormData(e.target);
+    const token = document.getElementById('__RequestVerificationToken')?.value;
+    if (token && !fd.get('__RequestVerificationToken')) fd.append('__RequestVerificationToken', token);
+
+    const handler = id ? 'EditAjax' : 'CreateAjax';
+    const res = await fetch(`?handler=${handler}`, { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (!data.success) {
+        document.getElementById('modalErrors').innerHTML = (data.errors || ['Server error']).join('<br>');
+        return;
+    }
+
+    const room = normalizeRoomDto(data.room || data);
+    if (id) {
+        const el = document.getElementById('room_' + room.id);
+        if (el) el.outerHTML = cardHtml(room);
+        bindRoomEvents();
+    } else {
+        document.getElementById('roomsContainer').insertAdjacentHTML('afterbegin', cardHtml(room));
+        bindRoomEvents();
+    }
+
+    bootstrap.Modal.getInstance(document.getElementById('roomModal')).hide();
+});
+
+/* ensure modal backdrop removed if stuck */
+document.addEventListener('hidden.bs.modal', () => {
+    document.querySelectorAll('.modal-backdrop').forEach(x => x.remove());
+});
+
+/* initial load */
+loadRooms(1);
+</script>

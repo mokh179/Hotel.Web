@@ -1,10 +1,12 @@
 using Hotel.Application.DTOs.Locations.Country;
 using Hotel.Application.Interfaces.Services;
+using Hotel.Application.Interfaces.Services.Profile;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Locations
 {
+    [IgnoreAntiforgeryToken]
     public class CountriesModel : PageModel
     {
         private readonly ICountryService _countryService;
@@ -84,8 +86,20 @@ namespace Hotel.Web.Areas.Admin.Pages.Locations
         // POST: Delete
         public async Task<JsonResult> OnPostDeleteAjaxAsync(Guid id)
         {
-            var success = await _countryService.DeleteAsync(id);
-            return new JsonResult(new { success });
+            try
+            {
+                var success = await _countryService.DeleteAsync(id);
+                return new JsonResult(new { success });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    errors = new[] { ex.Message }
+                });
+            }
+          
         }
     }
 }

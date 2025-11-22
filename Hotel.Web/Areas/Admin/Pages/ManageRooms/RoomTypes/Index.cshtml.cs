@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.RoomTypes
 {
     [IgnoreAntiforgeryToken]
-
     public class IndexModel : PageModel
     {
         private readonly IRoomTypeService _roomTypeService;
