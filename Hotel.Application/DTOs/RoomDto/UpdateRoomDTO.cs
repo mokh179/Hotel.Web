@@ -9,7 +9,8 @@ namespace Hotel.Application.DTOs.RoomDto
 {
     public class UpdateRoomDTO : CreateRoomDTO
     {
-        [Required]
+        [Required(ErrorMessage = "Room Id is required.")]
+
         public Guid Id { get; set; }
     }
 

@@ -42,8 +42,14 @@ namespace Hotel.Application.Mapping
 
             #region Room
             CreateMap<Room, RoomDTO>()
-                    .ForMember(dest => dest.RoomType, opt => opt.MapFrom(src => src.RoomType.ToString()))
-                    .ForMember(dest => dest.HotelName, opt => opt.MapFrom(src => src.Hotel.Name));
+                    .ForMember(d => d.HotelName, o => o.MapFrom(s => s.Hotel.Name))
+                    .ForMember(d => d.RoomTypeName, o => o.MapFrom(s => s.RoomType.Name))
+                    .ForMember(d => d.RoomTypeId, o => o.MapFrom(s => s.RoomTypeId))
+                    .ForMember(d => d.Price, o => o.MapFrom(s => s.Price)) 
+                    .ReverseMap();
+
+            CreateMap<CreateRoomDTO, Room>();
+            CreateMap<UpdateRoomDTO, Room>();
 
             CreateMap<CreateRoomDTO, Room>();
             CreateMap<UpdateRoomDTO, Room>();

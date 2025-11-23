@@ -1,0 +1,22 @@
+﻿@model Hotel.Application.DTOs.RoomDto.RoomDTO
+
+<div class="modal-header">
+    <h5 class="modal-title">Room Details</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<div class="modal-body">
+
+    <p><strong>Room Number:</strong> @Model.RoomNumber</p>
+    <p><strong>Hotel:</strong> @Model.HotelName</p>
+    <p><strong>Room Type:</strong> @Model.RoomTypeId</p>
+    <p><strong>Price:</strong> @Model.Price</p>
+    @* <p><strong>Availability:</strong> @(Model.IsAvailable ? "Available" : "Booked")</p> *@
+
+ 
+
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+</div>

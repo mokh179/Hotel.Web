@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Dashboard
 {
-    // [Authorize(Roles = "Admin")]
-    [Authorize]
+    [Authorize(Roles = "Admin")]
+    //[Authorize]
 
     public class IndexModel : PageModel
     {

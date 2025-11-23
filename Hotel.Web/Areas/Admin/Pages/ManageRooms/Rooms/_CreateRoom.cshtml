@@ -1,0 +1,57 @@
+﻿@model Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms._CreateRoomModel
+
+<div class="modal-header">
+    <h5 class="modal-title">Create Room</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form id="roomForm" data-handler="CreateAjax">
+    @Html.AntiForgeryToken()
+
+    <div class="modal-body">
+
+        <div class="mb-3">
+            <label class="form-label">Room Number</label>
+            <input name="RoomNumber" class="form-control" required />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Hotel</label>
+            <select name="HotelId" class="form-select" required>
+                <option value="">Select hotel</option>
+                @foreach (var h in Model.Hotels)
+                {
+                    <option value="@h.Id">@h.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Room Type</label>
+            <select name="RoomTypeId" class="form-select" required>
+                <option value="">Select room type</option>
+                @foreach (var rt in Model.RoomTypes)
+                {
+                    <option value="@rt.Id">@rt.Name</option>
+                }
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Price</label>
+            <input name="Price" type="number" class="form-control" step="0.01" min="1" required />
+        </div>
+
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea name="Description" class="form-control"></textarea>
+        </div>
+
+        <div class="modal-errors text-danger"></div>
+
+    </div>
+
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</form>

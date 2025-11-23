@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Locations
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
 
     [IgnoreAntiforgeryToken]
     public class CitiesModel : PageModel

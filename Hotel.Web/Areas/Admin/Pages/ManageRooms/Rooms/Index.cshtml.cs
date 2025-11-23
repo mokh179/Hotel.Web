@@ -1,77 +1,96 @@
+using Hotel.Application.DTOs.HotelDto;
 using Hotel.Application.DTOs.Pagination;
 using Hotel.Application.DTOs.RoomDto;
 using Hotel.Application.DTOs.RoomDto.RoomTypeDTO;
-using Hotel.Application.DTOs.HotelDto;
 using Hotel.Application.Interfaces.Services;
+using Hotel.Application.Interfaces.Services.Profile;
 using Microsoft.AspNetCore.Antiforgery;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Hotel.Application.Interfaces.Services.Profile;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms
 {
-    [Authorize]
-
-    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         private readonly IRoomService _roomService;
-        private readonly IHotelService _hotelservice;
+        private readonly IHotelService _hotelService;
         private readonly IRoomTypeService _roomTypeService;
-        private readonly IAntiforgery _antiforgery;
+        private readonly IAntiforgery _anti;
 
-        public IndexModel(IRoomService roomService, IHotelService hotelService, IRoomTypeService roomTypeService, IAntiforgery antiforgery)
+        public IndexModel(IRoomService roomService,
+                          IHotelService hotelService,
+                          IRoomTypeService roomTypeService,
+                          IAntiforgery anti)
         {
             _roomService = roomService;
-            _hotelservice = hotelService;
+            _hotelService = hotelService;
             _roomTypeService = roomTypeService;
-            _antiforgery = antiforgery;
+            _anti = anti;
         }
 
         public List<HotelDTO> Hotels { get; set; } = new();
         public List<RoomTypeDTO> RoomTypes { get; set; } = new();
 
-        // initial render
         public async Task OnGetAsync()
         {
-            // prefer cached lists for dropdowns if available
-            try
-            {
-                // try cache method name first, fallback to GetAllAsync
-                var hotelMethod = _hotelservice.GetType().GetMethod("GetAllCachedAsync");
-                if (hotelMethod != null)
-                    Hotels = await (Task<List<HotelDTO>>)hotelMethod.Invoke(_hotelservice, null);
-                else
-                    Hotels = await _hotelservice.GetAllAsync();
-            }
-            catch
-            {
-                Hotels = await _hotelservice.GetAllAsync();
-            }
-
-            try
-            {
-                var rtMethod = _roomTypeService.GetType().GetMethod("GetAllCachedAsync");
-                if (rtMethod != null)
-                    RoomTypes = await (Task<List<RoomTypeDTO>>)rtMethod.Invoke(_roomTypeService, null);
-                else
-                    RoomTypes = await _roomTypeService.GetAllAsync();
-            }
-            catch
-            {
-                RoomTypes = await _roomTypeService.GetAllAsync();
-            }
+            Hotels = await _hotelService.GetAllAsync();
+            RoomTypes = await _roomTypeService.GetAllAsync();
         }
 
-        // GET single room
-        public async Task<JsonResult> OnGetRoomAsync(Guid id)
+        // ---------------------------------------------
+        // GET: Partial Create
+        // ---------------------------------------------
+        public async Task<PartialViewResult> OnGetCreatePartial()
         {
-            var r = await _roomService.GetByIdAsync(id);
-            return new JsonResult(r);
+            var vm = new _CreateRoomModel();
+            Hotels = await _hotelService.GetAllAsync();
+            RoomTypes = await _roomTypeService.GetAllAsync();
+            vm.Hotels = Hotels;
+            vm.RoomTypes = RoomTypes;
+            return Partial("_CreateRoom", vm);
         }
 
-        // AJAX search
+        // ---------------------------------------------
+        // GET: Partial Edit
+        // ---------------------------------------------
+        public async Task<PartialViewResult> OnGetEditPartialAsync(Guid id)
+        {
+            var room = await _roomService.GetByIdAsync(id);
+            Hotels = await _hotelService.GetAllAsync();
+            RoomTypes = await _roomTypeService.GetAllAsync();
+            var vm = new _EditRoomModel
+            {
+                Room = new UpdateRoomDTO
+                {
+                    Id = room.Id,
+                    RoomNumber = room.RoomNumber,
+                    Price = room.Price,
+                    HotelId = room.HotelId,
+                    RoomTypeId = room.RoomTypeId,
+                    //Description = room.Description
+                },
+                Hotels = Hotels,
+                RoomTypes = RoomTypes
+            };
+            
+
+            return Partial("_EditRoom", vm);
+        }
+
+        // ---------------------------------------------
+        // GET: Details Partial
+        // ---------------------------------------------
+        public async Task<PartialViewResult> OnGetDetailsPartialAsync(Guid id)
+        {
+            var room = await _roomService.GetByIdAsync(id);
+            return Partial("_RoomDetails", room);
+        }
+
+        // ---------------------------------------------
+        // AJAX Search + Pagination
+        // ---------------------------------------------
         public async Task<JsonResult> OnGetSearchAjaxAsync(
             string number,
             Guid? hotelId,
@@ -83,39 +102,52 @@ namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms
             int pageSize = 9)
         {
             bool? isAvailable = null;
+
             if (!string.IsNullOrWhiteSpace(availability))
             {
                 if (availability == "available") isAvailable = true;
                 else if (availability == "booked") isAvailable = false;
             }
 
-            var paged = await _roomService.SearchRoomsAsync(number,
-                hotelId, roomTypeId,
-                priceMin, priceMax,
-                isAvailable, null,
-                page, pageSize);
+            var result = await _roomService.SearchRoomsAsync(
+                number,
+                hotelId,
+                roomTypeId,
+                priceMin,
+                priceMax,
+                isAvailable,
+                null,
+                page,
+                pageSize
+            );
 
-            var totalPages = (int)Math.Ceiling((double)paged.TotalCount / pageSize);
+            int totalPages = (int)Math.Ceiling((double)result.TotalCount / pageSize);
+
             return new JsonResult(new
             {
-                items = paged.Items,
-                totalCount = paged.TotalCount,
-                page = paged.Page,
-                pageSize = paged.PageSize,
+                items = result.Items,
+                result.Page,
+                result.PageSize,
                 totalPages
             });
         }
 
-        // CREATE
-        public async Task<JsonResult> OnPostCreateAjaxAsync([FromForm] CreateRoomDTO input)
+        // ---------------------------------------------
+        // CREATE AJAX
+        // ---------------------------------------------
+        public async Task<JsonResult> OnPostCreateAjaxAsync([FromForm] CreateRoomDTO dto)
         {
             if (!ModelState.IsValid)
-                return new JsonResult(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                return new JsonResult(new
+                {
+                    success = false,
+                    errors = ModelState.Values.SelectMany(x => x.Errors).Select(e => e.ErrorMessage)
+                });
 
             try
             {
-                var created = await _roomService.CreateAsync(input);
-                return new JsonResult(new { success = true, room = created });
+                var room = await _roomService.CreateAsync(dto);
+                return new JsonResult(new { success = true, room });
             }
             catch (Exception ex)
             {
@@ -123,16 +155,22 @@ namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms
             }
         }
 
-        // EDIT
-        public async Task<JsonResult> OnPostEditAjaxAsync([FromForm] UpdateRoomDTO input)
+        // ---------------------------------------------
+        // EDIT AJAX
+        // ---------------------------------------------
+        public async Task<JsonResult> OnPostEditAjaxAsync([FromForm] UpdateRoomDTO dto)
         {
             if (!ModelState.IsValid)
-                return new JsonResult(new { success = false, errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage) });
+                return new JsonResult(new
+                {
+                    success = false,
+                    errors = ModelState.Values.SelectMany(x => x.Errors).Select(e => e.ErrorMessage)
+                });
 
             try
             {
-                var updated = await _roomService.UpdateAsync(input);
-                return new JsonResult(new { success = true, room = updated });
+                var room = await _roomService.UpdateAsync(dto);
+                return new JsonResult(new { success = true, room });
             }
             catch (Exception ex)
             {
@@ -140,12 +178,14 @@ namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.Rooms
             }
         }
 
-        // DELETE
-        public async Task<JsonResult> OnPostDeleteAjaxAsync([FromForm] Guid Id)
+        // ---------------------------------------------
+        // DELETE AJAX
+        // ---------------------------------------------
+        public async Task<JsonResult> OnPostDeleteAjaxAsync([FromForm] Guid id)
         {
             try
             {
-                var ok = await _roomService.DeleteAsync(Id);
+                bool ok = await _roomService.DeleteAsync(id);
                 return new JsonResult(new { success = ok });
             }
             catch (Exception ex)

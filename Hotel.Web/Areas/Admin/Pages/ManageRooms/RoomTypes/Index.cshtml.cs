@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.ManageRooms.RoomTypes
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     [IgnoreAntiforgeryToken]
     public class IndexModel : PageModel
     {

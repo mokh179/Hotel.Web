@@ -90,7 +90,7 @@ namespace Hotel.Infrastructure.Services.Admin
                         .Select(g =>
                         {
                             var room = rooms.FirstOrDefault(r => r.Id == g.Key);
-                            return room?.RoomType.ToString();
+                            return room?.RoomTypeId.ToString();
                         })
                         .FirstOrDefault() ?? "No data";
 
