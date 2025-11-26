@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Hotels
 {
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         private readonly IHotelService _hotelService;
@@ -50,9 +50,11 @@ namespace Hotel.Web.Areas.Admin.Pages.Hotels
         }
 
         // Return cities for country (AJAX)
-        public async Task<JsonResult> OnGetCitiesAsync(Guid countryId)
+        public async Task<JsonResult> OnGetCitiesAsync(Guid? countryId)
         {
-            var cities = await _cityService.GetByCountryAsync(countryId);
+            if (countryId == null) return new JsonResult(new object[0]);
+            
+            var cities = await _cityService.GetByCountryAsync(countryId.Value);
             return new JsonResult(cities.Select(c => new { id = c.Id, name = c.Name }));
         }
 

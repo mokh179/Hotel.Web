@@ -193,20 +193,28 @@
     function bindModalForm() {
         const form = document.querySelector("#hotelModalContent form");
         if (!form) return;
-        // const isEdit = form.id === "editHotelForm";
 
-        // const countrySelector = isEdit ? "#Edit_CountryId" : "#Create_CountryId";
-        // const citySelector = isEdit ? "#Edit_CityId" : "#Create_CityId";
+        const isEdit = form.id === "editHotelForm";
+
+        const countrySelector = isEdit ? "#Edit_CountryId" : "#Create_CountryId";
+        const citySelector = isEdit ? "#Edit_CityId" : "#Create_CityId";
 
 
 
-        const c = form.querySelector('[name="CountryId"]');
-        const ct = form.querySelector('[name="CityId"]');
-
+            const c = form.querySelector('#Edit_CountryId') || form.querySelector('[name="CountryId"]');
+            const ct = form.querySelector('[name="CityId"]');
+        if (c && ct&&isEdit) {
+            
+            c.addEventListener("change", () =>
+                loadCitiesInsideModal(c.value, "#Edit_CityId"));
+        }
         if (c && ct) {
             c.addEventListener("change", () =>
-                loadCitiesInsideModal(c.value, '#Create_CityId'));
+                loadCitiesInsideModal(c.value, "#Create_CityId"));
         }
+    
+
+
 
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
