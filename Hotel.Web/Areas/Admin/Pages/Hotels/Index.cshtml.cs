@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Hotel.Web.Areas.Admin.Pages.Hotels
 {
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public class IndexModel : PageModel
     {
         private readonly IHotelService _hotelService;
@@ -91,7 +91,8 @@ namespace Hotel.Web.Areas.Admin.Pages.Hotels
                     CountryId = dto.CountryId,
                     CityId = dto.CityId,
                     Rating = dto.Rating,
-                    //Countries = await _locationService.GetAllCountriesAsync()
+                    Countries = await _countryService.GetAllAsync(),
+                    //Cities = await _cityService.GetAllAsync()
                 };
 
                 return Partial("_EditHotel", edit);
